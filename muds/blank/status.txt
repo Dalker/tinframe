@@ -1,0 +1,4 @@
+- status -
+status log test
+
+remove status.txt to get rid of this tmux pane

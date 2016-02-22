@@ -1,0 +1,30 @@
+#nop THIS IS A TEMPLATE
+
+#split 0 2
+#showme {------ *   *   * ------} 1;
+
+#nop create adequate prompt for a new character using mud's syntax
+#alias myprompt {
+  prompt $A<$1\%b\%\%hp$A$4\%c\%\%ma$A$6\%d\%\%mv$A> (\%r - \%H) \%g\%n
+}
+
+#nop hook on mud's prompt
+#prompt {<%1\%hp%2\%ma%3\%mv> (%4 - %5) %6} {@theprompt{%1;%2;%3;%4;%5;%6};} {1};
+#function {theprompt}{
+  #nop interpret prompt using tintin variables;
+  #var hpp %1;
+  #var map %2;
+  #var mvp %3;
+  #var loc %4;
+  #var time %5;
+  #var coins %6;
+
+  #nop process information from prompt;
+  #nop (#if ..., #math ...) ;
+
+  #nop display on first line of split;
+  #showme {<069>$name<099> at <039>$loc <059> $time}{2};
+
+  #nop display on second line of split;
+  #return @colscale{$hpp;100}$hpp<099>hp @colscale{$map;100}$map<099>ma @colscale{$mvp;100}$mvp<099>mv - <029>$coins<099>
+};

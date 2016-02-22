@@ -1,0 +1,14 @@
+#nop THIS IS A TEMPLATE
+
+#nop -----------------------------------------
+#nop  Possible entry points to the map
+#nop -----------------------------------------
+
+#act {^Before the East Gates of Thiscity} {loadmap thiscity eastgate;}
+
+#nop -----------------------------------------
+#nop   Map move auto-undos
+#nop -----------------------------------------
+
+#alias mu {#map undo}
+#act {^Alas, you cannot go that way.} {#map undo}

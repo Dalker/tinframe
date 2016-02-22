@@ -1,0 +1,13 @@
+#nop THIS IS A TEMPLATE
+
+#nop -----------------------------------------
+#nop Thiscity map's specific actions
+#nop -----------------------------------------
+
+#act {^Only bank employees may go in there.} {#map undo}
+
+#echo {class thiscity (re)loaded};
+#nop------------------------
+#nop CopyLeft by dalker
+#nop create date: 2015-06-12
+#nop modif  date: 2015-06-12

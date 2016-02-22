@@ -1,0 +1,17 @@
+#nop THIS IS A TEMPLATE
+
+#nop personal conversation
+#act {^You tell %1 %2}  {chatlog {<adc>me (to %1)<099>:%2<099>}}
+#act {^You reply to %1 %2}  {chatlog {<adc>me (to %1)<099>:%2<099>}}
+#act {^%1 tells you %2} {chatlog {<adc>%1 (to me)<099>:%2<099>}}
+#act {^%1 replies %2} {chatlog {<adc>%1 (to me)<099>:%2<099>}}
+
+#nop char's emotes
+#act {^$char %1} {chatlog {$char(me) %1}}
+
+#nop channel chatter
+#act {%1 newbies, '%2} {chatlog {<bbd>[newbie:%1]%2<099>}} 
+#act {You newbie, '%2} {chatlog {<bbd>[newbie:me]%2<099>}} 
+
+#nop information worth of logging
+#act {^You rise a level!} {loglog {<caf>Level gained!<099>}}

@@ -1,0 +1,277 @@
+#nop -----------------------------------------
+#nop  Standard map handling (mud independent)
+#nop -----------------------------------------
+#nop $currentmap will hold the current map name
+#nop aliases 'newmap', 'loadmap', 'savemap', 'closemap' (also saves), 'tossmap' (doesn't save), redrawmap
+#nop alias 'maptransition' to switch between maps
+#nop also 'moveonmap' and its counterpart 'moveforreal'
+
+#nop << auxiliary functions: 'redrawmap', 'savemap', 'setmap name', 'unsetmap';
+
+#alias redrawmap {#MAP {map} {59x22} {map.txt}};
+
+#alias setmap {
+  #variable currentmap %1;
+  #format mapfile {maps/%s.map} {$currentmap};
+  #format mclfile {maps/%s.tt}  {$currentmap};
+#nop   #class map open;
+  #EVENT {MAP ENTER ROOM} {redrawmap};
+#nop   #class temp open;
+}
+
+#alias unsetmap {
+  #unvar currentmap;
+  #unvar mapfile;
+  #unvar mclfile;
+  #UNEVENT {MAP ENTER ROOM};
+}
+
+#alias savemap {
+  #if &mapfile {
+    #map write $mapfile;
+    #echo {map saved.};
+  };
+  #else {
+    #echo {savemap: impossible to save - current map not defined.};
+  }
+}
+#nop >>
+#nop << 'closemap', also called by newmap and loadmap;
+#alias closemap {
+  #class temp write map.txt;
+  #if &mapfile {
+    #echo {leaving $currentmap map safely.};
+    savemap;
+    #map destroy;
+    unsetmap;
+  };
+  #else {
+    #echo {closemap: impossible to close map - current map not defined.};
+  }
+}
+#nop >>
+#nop << destroy map without saving: 'tossmap';
+#alias tossmap {
+  #class temp write map.txt;
+  #if &mapfile {
+    #echo {tossing $currentmap map without saving.};
+    #map destroy;
+    unsetmap;
+  };
+  #else {
+    #echo {tossmap: impossible to close map - current map not defined.};
+  }
+}
+#nop >>
+#nop << create a new map and make current room its first room: 'newmap name';
+#alias newmap {
+  #if     {"%1" == ""}            {#echo {newmap: can't create anonymous map.}};
+  #elseif {"%1" == "$currentmap"} {#echo {newmap: can't create new map with name of current map.}};
+  #else   {
+    #format tmp {maps/%s.map} {%1};
+    #script {temp} {ls $tmp};
+    #if {"$temp[1]" != ""}{
+      #echo {newmap: can't create map %1, file $tmp already exists!};
+    };
+    #unvar $temp;
+    #unvar tmp;
+    #else {
+      closemap;
+      setmap %1;
+      #map create 1000;
+      #map goto   1;
+    };
+  };
+}
+#nop >>
+#nop << load existing map with optional destination: 'loadmap name [room]';
+#alias loadmap {
+  #nop if no map asked, stop;
+  #if     {"%1" == ""}            {#echo {loadmap: can't load anonymous map.}};
+ 
+  #nop avoid trouble with unwanted current map saving by not closing it;
+  #elseif {"%1" == "$currentmap"} {#echo {loadmap: current map can't be reloaded without closing it explicitly first (save it or not?)}};
+ 
+  #nop make sure map file exists;
+  #format tmp {maps/%s.map} {%1};
+  #script {temp} {ls $tmp};
+  #elseif {"$temp[1]" == ""}{
+    #echo {loadmap: can't find mapfile $tmp - aborting};
+  };
+  #unvar $temp;
+  #unvar $tmp;
+
+  #else {
+    #nop now that actual map load is confirmed, cleanly leave previous map, if any;
+    closemap;
+
+    #nop actual map loading;
+    setmap %1;
+    #map read $mapfile;
+
+    #nop (re)load map class if exists;
+    #script {temp} {ls $mclfile};
+    #if {"$temp[1]" != ""}{
+       classincludefrom maps/$currentmap;
+       #echo {loadmap: map class file found and loaded};
+    };
+    #unvar $temp;
+  };
+
+  #nop goto map location (default = room 1);
+  #if {"%2" != ""} {
+    #echo {entering map at location %2};
+    #map goto {%2};
+  } {#map goto 1};
+
+}
+#nop >>
+#nop << make moving to some direction actually switch to other map: 'maptransition dir mapname [room]';
+#nop    notice: the direction has to point to an existing room that will never be actually reached, but
+#nop            which typically has a mapsymbol pointing to the destination
+#alias maptransition {
+  mapexit %1 {#delay .1 {loadmap %2 %3}; #send {%1}; #echo {loading map... wait a tiny bit!}}
+}
+#nop >>
+
+#nop -----------------------------------------
+#nop   Other actions on map
+#nop -----------------------------------------
+#nop alias 'goto <dest>' and macro <F1> : set destination and walk there
+#nop aliases 'mapsymbol' [clear|symbol], 'mapexit' [hide|void|command], 'mapname' [clear|symbol]
+#nop << 'goto room' and then travel path to selected location with F1;
+#alias goto {
+  #map find {%0};
+}
+
+#macro {\e[11~} {#path walk}
+#macro {\eOP}   {#path walk}
+#nop >>
+#nop << Set current room's symbol, name and exit properties: 'mapsymbol S', 'mapname name', mapexit foo [hide|void|command]'
+#alias mapsymbol {
+  #if { "%1" == "" } {
+    #map get roomsymbol tmp;
+    #if { "$tmp" == "" } {
+      #echo {this room has no symbol};
+    };
+    #else { 
+      #echo {room symbol is $tmp};
+    };
+  };
+  #elseif { "%1" == "clear" } {
+    #map set roomsymbol {};
+    #echo {room symbol cleared};
+  };
+  #else { 
+    #map set roomsymbol %0;
+    #echo {room symbol set to %0};
+  }
+}
+#alias mapname   {
+  #if { "%1" == "" } {
+    #map get roomname tmp;
+    #if { "$tmp" == "" } {
+      #echo {this room has no name};
+    };
+    #else { 
+      #echo {room name is $tmp};
+    };
+  };
+  #elseif { "%1" == "clear" } {
+    #map name {};
+    #echo {room name cleared};
+  };
+  #else { 
+    #map name %0;
+    #echo {room name set to %0};
+  }
+}
+#alias mapexit {
+  #if { "%2" == "hide"}{
+    #map exitflag %1 hide;
+    #echo {set exit at %1 to auto-hide};
+  };
+  #elseif { "%2" == "void"}{
+    #map exit %1 void;
+    #echo {set room to the %1 to void};
+  };
+  #else {
+    #map exit %1 command {%2};
+    #echo {set exit at %1 to really mean %2};
+  };
+}
+#nop >>
+
+#nop -----------------------------------------
+#nop   General map setup 
+#nop -----------------------------------------
+#nop << various configs and pathdirs;
+#CONFIG   {SPEEDWALK}  {OFF}
+#PATHDIR  {n}  {s}   {1}
+#PATHDIR  {e}  {w}   {2}
+#PATHDIR  {s}  {n}   {4}
+#PATHDIR  {w}  {e}   {8}
+#PATHDIR  {u}  {d}   {16}
+#PATHDIR  {d}  {u}   {32}
+#PATHDIR  {ne} {sw}  {3}
+#PATHDIR  {nw} {se}  {9}
+#PATHDIR  {se} {nw}  {6}
+#PATHDIR  {sw} {ne}  {12}
+#PATHDIR  {north} {south} {1}
+#PATHDIR  {east}  {west}  {2}
+#PATHDIR  {south} {north} {4}
+#PATHDIR  {west}  {east}  {8}
+#PATHDIR  {up}    {down}  {16}
+#PATHDIR  {down}    {up}  {32}
+#PATHDIR  {northeast} {southwest} {3}
+#PATHDIR  {northwest} {southeast} {9}
+#PATHDIR  {southeast} {northwest} {6}
+#PATHDIR  {southwest} {northeast} {12}
+#nop the following is for vtmap style, normally not used
+#map legenda ▪ █ █ ╚ █ ║ ╔ ╠ █ ╝ ═ ╩ ╗ ╣ ╦ ╬ ▩ 
+#nop >>
+
+#nop -----------------------------------------
+#nop   Keypad motion
+#nop -----------------------------------------
+#nop << moveforreal (default) and moveonmap
+#alias moveforreal {
+  #macro {\eOt} {w};
+  #macro {\eOv} {e};
+  #macro {\eOx} {n};
+  #macro {\eOr} {s};
+  #macro {\eOw} {nw};
+  #macro {\eOy} {ne};
+  #macro {\eOs} {se};
+  #macro {\eOq} {sw};
+  #macro {\eOm} {d};
+  #macro {\eOk} {u};
+  #echo {keypad will now provide real movement};
+  #var moving {real};
+}
+#alias moveonmap {
+  #macro {\eOt} {#map move w};
+  #macro {\eOv} {#map move e};
+  #macro {\eOx} {#map move n};
+  #macro {\eOr} {#map move s};
+  #macro {\eOw} {#map move nw};
+  #macro {\eOy} {#map move ne};
+  #macro {\eOs} {#map move se};
+  #macro {\eOq} {#map move sw};
+  #macro {\eOm} {#map move d};
+  #macro {\eOk} {#map move u};
+  #echo {keypad will now provide movement on map only};
+  #var moving {map};
+}
+#alias movetoggle {
+  #if { "$moving" == "real" } { moveonmap } { moveforreal };
+}
+#macro {\eOo} {movetoggle};
+moveforreal
+#nop >>
+
+#nop #echo {class maplib (re)loaded};
+#nop------------------------
+#nop CopyLeft by dalker
+#nop create date: 2014-02-12
+#nop modif  date: 2016-02-22

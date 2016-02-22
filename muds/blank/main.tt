@@ -1,0 +1,73 @@
+#nop THIS IS A TEMPLATE
+#nop What's expected of this main.tt file:
+#nop - this file's dir has subdirs named include/, map/, chars/ and log/
+#nop - variables $mudname $mudhost and $mudport are defined below
+#nop - class 'temp' opened at the end of this file
+
+#class main open
+
+#nop mandatory mud-specific configuration in next 3 lines:
+#var mudname {GoodMud}
+#var mudhost mud.goodmud.org 
+#var mudport 1111
+
+#nop << includes -----------------------------------------
+#read {$libdir/common.tt}
+#alias charinclude { 
+  #if { &charfile } { 
+    classincludefrom $charfile;
+  }; 
+  #else { #echo {no char defined yet}; };
+}
+classinclude map
+classinclude chat
+classinclude prompt
+#echo {classes map, chat, prompt included}
+charinclude
+#nop >>
+#nop -----------------------------------------
+#class main open
+
+#nop optional mud-specific config below:
+#nop << login handling
+#nop login request detection
+#act {^By which name would you like to be known?} {
+  loginas; #nop with no arguments, loginas gives a list of possible arguments;
+}
+#alias loginsequence {
+  $name;
+  $pass;
+}
+#nop >>
+#nop << logout handling
+#alias postquit {
+  #nop extra bits of quit handling after map is closed;
+  #nop by default this acts both after quit and timeout
+  memalso {#nop extra stuff};
+}
+#nop >>
+
+#nop mud-specific scripting starts here:
+#nop << bags handling
+#nop char needs to setup vars with bag names
+#nop main bag handling (mud specific syntax)
+#alias mbl {look in $mainbag};
+#alias mbg {get %0 $mainbag};
+#alias mbp {put %0 $mainbag};
+#alias mbo {open $mainbag};
+#alias mbc {close $mainbag};
+#alias tbl {look in $toolbag};
+#alias tbg {get %0 $toolbag};
+#alias tbp {put %0 $toolbag};
+#alias tbo {open $toolbag};
+#alias tbc {close $toolbag};
+#alias lbl {look in $lootbag};
+#alias lbg {get %0 $lootbag};
+#alias lbp {put %0 $lootbag};
+#alias lbo {open $lootbag};
+#alias lbc {close $lootbag};
+#nop >>
+
+#nop------------------------
+#echo {class main (re)loaded}
+#class temp open

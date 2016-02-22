@@ -1,0 +1,10 @@
+#nop THIS IS A TEMPLATE
+#nop this file, named $char.tt will be called by 'loginas $char'
+
+#var name JohnDoe
+#var pass mypassword
+#var mainbag backpack
+#var toolbag satchel
+#var lootbag bag
+
+#echo {class $char (re)loaded}

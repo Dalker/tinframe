@@ -1,0 +1,66 @@
+#!/bin/zsh
+TFMUDSDIR=${TFMUDSDIR:-./muds}
+TFLIBDIR=${TFLIBDIR:-../../lib}
+LOGFILE="logs/log.txt"
+CHATFILE="logs/chat.txt"
+MAPFILE="map.txt"
+STATFILE="status.txt"
+MAINTT="main.tt"
+
+if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
+then
+  echo "Usage: $(basename $0) <name>, where <name> is one of:"
+  cd $TFMUDSDIR
+  ls | sed -e "s/blank//" -e "s/past//" | xargs echo
+  cd -
+else
+  # name of tmux session
+  export SESSION="$1"
+   
+  # if session already running, attach it.
+  tmux has-session -t $SESSION 2> /dev/null
+  if [ $? -eq 0 ]; then
+    echo "Session $SESSION already exists. Attaching."
+    sleep 1
+    tmux attach -t $SESSION
+  else
+    # else create it, and detach it to work on it a bit
+    tmux new-session -d -s $SESSION
+    # populate the session using corresponding script
+    echo populating session for $TFMUDSDIR/$SESSION
+     
+    # act on shell first
+    cd $TFMUDSDIR/$SESSION
+     
+    # setup window and start tintin
+#     tmux new-window    -t $SESSION:1 -k -n "tintin" "tintin -G -t main $MAINTT; tmux kill-session -t $SESSION"
+#     above line ceased to work for some reason; replaced with following hack
+    tmux new-window    -t $SESSION:1 -k -n "tintin" "zsh"
+    tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -t main $MAINTT && tmux kill-session" Enter
+    tmux new-window    -t $SESSION:2 -k -n "vim"
+    tmux select-window -t $SESSION:1
+    
+    # setup panes and start chat, log, map and status streams
+    # first split: left 1.1 | right 1.2 -- secondary column has smaller width than tintin window
+    tmux split-window -t $SESSION:1   -h -l 60 "tail -Fs1 $LOGFILE"
+    # split left between up 1.3 / down 1.1 -- chat window should have same width as tintin window
+    tmux split-window -t $SESSION:1.1 -b -v "tail -Fs1 $CHATFILE"
+    tmux resize-pane  -t $SESSION:1.3 -y 8
+    # split right between up 1.2 / down 1.4 -- map on secondary column, fixed width for map
+    tmux split-window -t $SESSION:1.2 -v -l 22 "tail -Fs0.5 $MAPFILE"
+    # split right between up 1.5 / down 1.2 -- last split *if* status file is used
+    if [[ -f $STATFILE ]]; then
+      tmux split-window -t $SESSION:1.2 -b -v "tail -Fs1 $STATFILE"
+      tmux resize-pane  -t $SESSION:1.5 -y 8
+    fi
+    # select main pane
+    tmux select-pane  -t $SESSION:1.1
+        
+    # re-attach session
+    exec tmux attach -t $SESSION
+  fi
+fi
+#------------------------
+# CopyLeft by dalker
+# create date: 2014-02-09
+# modif  date: 2016-02-21
