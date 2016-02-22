@@ -11,7 +11,7 @@
 
 * login with **[F9]**, reload scripts with **[F5]**
 
-* the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than "$user;$pass". Logging in with the 'loginas' alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis.
+* the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than *"$user;$pass"*. Logging in with the 'loginas' alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis.
 
 * the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities:
   * **newmap**  *\<map\>*                      : create a new map and enter it
