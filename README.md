@@ -1,4 +1,4 @@
-### tinframe - a TinTin++ framework
+### tinframe - a framework for TinTin++ using tmux
 
 * This project is a framework for using the [TinTin++](http://tintin.sourceforge.net/) mud client using the [tmux](https://tmux.github.io/) terminal multiplexer
 
@@ -9,13 +9,13 @@
   * *tinframe2* is meant for smaller screens. The contents of tinframe's main tmux window are split between two tmux windows: the first one has the main mud output and chat zone, the second one has the map and everything else.
   * both of these scripts will look for the tinframe lib scripts at a location ../../lib relative to the mud specific scripts, or at $TFLIBDIR if this environment variable exists; also, they assume mud-specific configuration is at ./muds, unless $TFMUDSDIR variable environment exists
 
-* login with <F9>, reload scripts with <F5>
+* login with [F9], reload scripts with [F5]
 
 * the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than "$user;$pass". Logging in with the 'loginas' alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis.
 
 * the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities:
-  * *newmap*  <map>                      : create a new map and enter it
-  * *loadmap* <map> [<room>]             : enter pre-existing map at some room (default: room 1)
+  * *newmap*  \<map\>                      : create a new map and enter it
+  * *loadmap* \<map\> [\<room\>]             : enter pre-existing map at some room (default: room 1)
   * *maptransition* <dir> <map> [<room>] : make moving to the room in <dir> direction actually switch to other map
   * *mapsymbol* <1 or 3 chars>           : adds a label to current room (or <clear> to clear)
   * *mapname* <name>                     : gives a name to current room (or <clear> to clear)
