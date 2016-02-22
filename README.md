@@ -16,12 +16,12 @@
 * the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities:
   * **newmap**  *\<map\>*                      : create a new map and enter it
   * **loadmap** *\<map\> [room]*             : enter pre-existing map at some room (default: room 1)
-  * **maptransition** *\<dir\> \<map\> [room]* : make moving to the room in \<dir\> direction actually switch to other map
-  * **mapsymbol** *\<1 or 3 chars\>*           : adds a label to current room (or \<clear\> to clear)
-  * **mapname** *\<name\>*                     : gives a name to current room (or \<clear\> to clear)
+  * **maptransition** *\<dir\> \<map\> [room]* : make moving to the room in *\<dir\>* direction actually switch to other map
+  * **mapsymbol** *\<1 or 3 chars\>*           : adds a label to current room (or *\<clear\>* to clear)
+  * **mapname** *\<name\>*                     : gives a name to current room (or *\<clear\>* to clear)
   * **mapexit** *\<dir\>* hide                 : hides/unhides map in the provided direction
   * **mapexit** *\<dir\>* void                 : makes room in provided direction void (or back to normal)
-  * **mapexit** *\<dir\> \<action\>*             : really does \<action\> when moving into provided direction
+  * **mapexit** *\<dir\> \<action\>*             : really does *\<action\>* when moving into provided direction
 
   and also:
   * **savemap**   : saves current map file (done automatically when loading other map or quitting)
