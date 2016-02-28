@@ -122,8 +122,8 @@
 #alias onquit {
   #nop stuff to be done before map is closed;
   #nop override this alias on mud tt file if necessary;
-  #nop by default, character's map location is saved
-  #nop typically any other info would be saved later on postquit
+  #nop by default, character's map location is saved;
+  #nop typically any other info would be saved later on postquit;
   #if &char {
     memchar $char;
     closemap;
@@ -234,4 +234,4 @@ libinclude maplib;
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-02-21
+#nop modif  date: 2016-02-28
