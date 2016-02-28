@@ -9,7 +9,7 @@
   * **tinframe2** is meant for smaller screens. The contents of tinframe's main tmux window are split between two tmux windows: the first one has the main mud output and chat zone, the second one has the map and everything else.
   * both of these scripts will look for the tinframe lib scripts at a location *../../lib* relative to the mud specific scripts, or at *$TFLIBDIR* if this environment variable exists; also, they assume mud-specific configuration is at *./muds*, unless *$TFMUDSDIR* variable environment exists
 
-* login with **[F9]**, reload scripts with **[F5]**
+* login with **[F9]**, reload scripts with **[F12]**
 
 * the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than *"$user;$pass"*. Logging in with the 'loginas' alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis.
 
@@ -30,8 +30,8 @@
   * **redrawmap** : does what it says, if ever needed
 
   paths can be made and followed with:
-  * **goto** *\<room\>* : creates tintin path to room
-  * **[F1]**        : moves by one room in the path
+  * **goto** *\<room\>*   : creates tintin path to room
+  * **[numpad-*]**        : moves by one room in the path
 
   Finally, if keypad is used for motion (without numlock), then the numpad '**/**' key switches between two modes: moving for real (on mud) or moving on map (meaning on map only, not fo real). This is useful when adding map symbols and names, connecting rooms 'by hand', inserting void rooms, etc...
 
