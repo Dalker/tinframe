@@ -5,7 +5,7 @@
 #class lib open
 
 #nop What's expected of caller:
-#nop - caller is called 'main.tt' (for reloader macro F5)
+#nop - caller is called 'main.tt' (for reloader macro F12)
 #nop - caller's dir has subdirs 'include/', 'chars/', 'map/' and 'log/'
 #nop - variables '$mudname' '$mudhost' and '$mudport' have been defined
 #nop - class 'temp' opened at the end of caller's script
@@ -17,7 +17,7 @@
 #nop - alias 'classincludefrom' to include files from other dirs
 #nop - alias 'loginas' to login using a character defined on a chars/ .tt file and recall information about it
 #nop - aliases 'chatlog' and 'loglog' for standard logs, 'statlog' and 'maplog' for other windows
-#nop - macro key <F5> to reload all scripts
+#nop - macro key <F12> to reload all scripts
 #nop - macro key <F9> to connect to mud (with 'loglog' of connection)
 #nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
 #nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
@@ -182,9 +182,10 @@
   #echo {recalled memfile for %1};
 };
 #nop >>
-#nop << function key macros - <F5>:reload scripts and <F9>:connect to mud;
-#nop reload all scripts with F5 (saving temp stuff);
-#macro {\e[15~} {
+#nop << function key macros - <F12>:reload scripts and <F9>:connect to mud;
+#nop reload all scripts with F12 (saving temp stuff);
+#nop used to bed {\e[15~} for F5
+#macro {\e[24~} {
   #class temp write temp.tt;
   #class main kill;
   #read  main.tt;
