@@ -89,41 +89,44 @@
   #nop if no map asked, stop;
   #if     {"%1" == ""}            {#echo {loadmap: can't load anonymous map.}};
  
-  #nop avoid trouble with unwanted current map saving by not closing it;
-  #elseif {"%1" == "$currentmap"} {#echo {loadmap: current map can't be reloaded without closing it explicitly first (save it or not?)}};
- 
   #nop make sure map file exists;
   #format tmp {maps/%s.map} {%1};
   #script {temp} {ls $tmp};
   #elseif {"$temp[1]" == ""}{
     #echo {loadmap: can't find mapfile $tmp - aborting};
+    #unvar $temp;
+    #unvar $tmp;
   };
-  #unvar $temp;
-  #unvar $tmp;
 
-  #else {
-    #nop now that actual map load is confirmed, cleanly leave previous map, if any;
-    closemap;
+  #else { #nop map asked for exists, continue;
+    
+    #if {"%1" == "$currentmap"} { #nop check if already on asked for map;
+      #echo {loadmap: staying in same map}
+    };
 
-    #nop actual map loading;
-    setmap %1;
-    #map read $mapfile;
+    #else { #nop change to different map if asked for;
+      #nop cleanly leave previous map, if any;
+      closemap;
 
-    #nop (re)load map class if exists;
-    #script {temp} {ls $mclfile};
+      #nop actual map loading;
+      setmap %1;
+      #map read $mapfile;
+    };
+
+    #nop (re)load map class if it exists;
+    #script {temp} {ls $mclfile >> /dev/null};
     #if {"$temp[1]" != ""}{
-       classincludefrom maps/$currentmap;
-       #echo {loadmap: map class file found and loaded};
+      classincludefrom maps/$currentmap;
+      #echo {loadmap: map class file found and loaded};
     };
     #unvar $temp;
+
+    #nop goto asked for map location (default = room 1);
+    #if {"%2" != ""} {
+      #echo {entering map at location %2};
+      #map goto {%2};
+    } {#map goto 1};
   };
-
-  #nop goto map location (default = room 1);
-  #if {"%2" != ""} {
-    #echo {entering map at location %2};
-    #map goto {%2};
-  } {#map goto 1};
-
 }
 #nop >>
 #nop << make moving to some direction actually switch to other map: 'maptransition dir mapname [room]';
@@ -137,15 +140,16 @@
 #nop -----------------------------------------
 #nop   Other actions on map
 #nop -----------------------------------------
-#nop alias 'goto <dest>' and macro <F1> : set destination and walk there
+#nop alias 'goto <dest>' and macro <Num*> : set destination and walk there
 #nop aliases 'mapsymbol' [clear|symbol], 'mapexit' [hide|void|command], 'mapname' [clear|symbol]
-#nop << 'goto room' and then travel path to selected location with F1;
+#nop << 'goto room' and then travel path to selected location with <Num*>;
 #alias goto {
   #map find {%0};
 }
+#macro {\eOj}   {#path walk}
+#nop #macro {\e[21~} {#path walk}
+#nop #macro {\eOP}   {#path walk}
 
-#macro {\e[11~} {#path walk}
-#macro {\eOP}   {#path walk}
 #nop >>
 #nop << Set current room's symbol, name and exit properties: 'mapsymbol S', 'mapname name', mapexit foo [hide|void|command]'
 #alias mapsymbol {
@@ -274,4 +278,4 @@ moveforreal
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-02-22
+#nop modif  date: 2016-02-28
