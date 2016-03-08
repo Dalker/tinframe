@@ -86,46 +86,51 @@
 #nop >>
 #nop << load existing map with optional destination: 'loadmap name [room]';
 #alias loadmap {
-  #nop if no map asked, stop;
-  #if     {"%1" == ""}            {#echo {loadmap: can't load anonymous map.}};
- 
-  #nop make sure map file exists;
-  #format tmp {maps/%s.map} {%1};
-  #script {temp} {ls $tmp};
-  #elseif {"$temp[1]" == ""}{
-    #echo {loadmap: can't find mapfile $tmp - aborting};
-    #unvar $temp;
-    #unvar $tmp;
+  #nop if no map asked, list available maps;
+  #if     {"%1" == ""}            {
+    #echo {loadmap: can't load anonymous map. Available maps are:};
+    #script {maplist} {ls maps | grep ".map$"| sed "s/\.map$//" | xargs echo};
+    #echo $maplist[1];
   };
-
-  #else { #nop map asked for exists, continue;
-    
-    #if {"%1" == "$currentmap"} { #nop check if already on asked for map;
-      #echo {loadmap: staying in same map}
+  #else {
+    #nop make sure map file exists;
+    #format tmp {maps/%s.map} {%1};
+    #script {temp} {ls $tmp};
+    #if {"$temp[1]" == ""}{
+      #echo {loadmap: can't find mapfile $tmp - aborting};
+      #unvar $temp;
+      #unvar $tmp;
     };
 
-    #else { #nop change to different map if asked for;
-      #nop cleanly leave previous map, if any;
-      closemap;
+    #else { #nop map asked for exists, continue;
+      
+      #if {"%1" == "$currentmap"} { #nop check if already on asked for map;
+        #echo {loadmap: staying in same map}
+      };
 
-      #nop actual map loading;
-      setmap %1;
-      #map read $mapfile;
+      #else { #nop change to different map if asked for;
+        #nop cleanly leave previous map, if any;
+        closemap;
+
+        #nop actual map loading;
+        setmap %1;
+        #map read $mapfile;
+      };
+
+      #nop (re)load map class if it exists;
+      #script {temp} {ls $mclfile 2&> /dev/null};
+      #if {"$temp[1]" != ""}{
+        classincludefrom maps/$currentmap;
+        #echo {loadmap: map class file found and loaded};
+      };
+      #unvar $temp;
+
+      #nop goto asked for map location (default = room 1);
+      #if {"%2" != ""} {
+        #echo {entering map at location %2};
+        #map goto {%2};
+      } {#map goto 1};
     };
-
-    #nop (re)load map class if it exists;
-    #script {temp} {ls $mclfile >> /dev/null};
-    #if {"$temp[1]" != ""}{
-      classincludefrom maps/$currentmap;
-      #echo {loadmap: map class file found and loaded};
-    };
-    #unvar $temp;
-
-    #nop goto asked for map location (default = room 1);
-    #if {"%2" != ""} {
-      #echo {entering map at location %2};
-      #map goto {%2};
-    } {#map goto 1};
   };
 }
 #nop >>
@@ -133,7 +138,11 @@
 #nop    notice: the direction has to point to an existing room that will never be actually reached, but
 #nop            which typically has a mapsymbol pointing to the destination
 #alias maptransition {
-  mapexit %1 {#delay .1 {loadmap %2 %3}; #send {%1}; #echo {loading map... wait a tiny bit!}}
+  #if { "%3" == "" } { 
+    mapexit %1 {#delay .1 {loadmap %2}; #send {%1}; #echo {loading map... wait a tiny bit!}};
+  } {
+    mapexit %1 {#delay .1 {loadmap %2}; #send {%3}; #echo {loading map... wait a tiny bit!}};
+  };
 }
 #nop >>
 
@@ -278,4 +287,4 @@ moveforreal
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-02-28
+#nop modif  date: 2016-03-06
