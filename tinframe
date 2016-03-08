@@ -11,7 +11,7 @@ if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
 then
   echo "Usage: $(basename $0) <name>, where <name> is one of:"
   cd $TFMUDSDIR
-  ls | sed -e "s/blank//" -e "s/past//" | xargs echo
+  ls | sed -e "s/blank//" -e "s/past//" -e "s/lib//" | xargs echo
   cd -
 else
   # name of tmux session
@@ -63,4 +63,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2014-02-09
-# modif  date: 2016-02-21
+# modif  date: 2016-03-05
