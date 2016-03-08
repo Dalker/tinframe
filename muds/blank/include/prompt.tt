@@ -5,26 +5,45 @@
 
 #nop create adequate prompt for a new character using mud's syntax
 #alias myprompt {
-  prompt $A<$1\%b\%\%hp$A$4\%c\%\%ma$A$6\%d\%\%mv$A> (\%r - \%H) \%g\%n
+  prompt $A<$1\%b\%\%hp$A$4\%c\%\%ma$A$6\%d\%\%mv$A> (\%r - \%H) [\%g]\%n
 }
 
 #nop hook on mud's prompt
-#prompt {<%1\%hp%2\%ma%3\%mv> (%4 - %5) %6} {@theprompt{%1;%2;%3;%4;%5;%6};} {1};
-#function {theprompt}{
+#gag {<%1\%hp%2\%ma%3\%mv> (%4 - %5) [%6]%7} {@theprompt{%1;%2;%3;%4;%5;%6;%7};};
+#action {<%1\%hp%2\%ma%3\%mv> (%4 - %5) [%6]%7} {
   #nop interpret prompt using tintin variables;
+  #var prevhp   $hpp;
+  #var prevsp   $spp;
+  #var prevgold $gold;
   #var hpp %1;
   #var map %2;
   #var mvp %3;
   #var loc %4;
   #var time %5;
-  #var coins %6;
+  #var gold %6;
+  #var trailing "%7";
 
   #nop process information from prompt;
   #nop (#if ..., #math ...) ;
 
-  #nop display on first line of split;
-  #showme {<069>$name<099> at <039>$loc <059> $time}{2};
+  #nop display on prompt split;
+  #showme {<069>$name<099> at <039>$loc <059> $time} {2};
+  #showme {@colscale{$hpp;100}$hpp<099>hp @colscale{$map;100}$map<099>ma @colscale{$mvp;100}$mvp<099>mv - <029>$gold<099>} {1};
 
-  #nop display on second line of split;
-  #return @colscale{$hpp;100}$hpp<099>hp @colscale{$map;100}$map<099>ma @colscale{$mvp;100}$mvp<099>mv - <029>$coins<099>
+  #nop display on main split:;
+  #nop ... any variations since last prompt;
+  #math varhp   { $hpp  - $prevhp };
+  #math varsp   { $spp  - $prevsp };
+  #math vargold { $gold - $prevgold };
+  #var delta {};
+  #if { $varhp   > 0 } { #var delta {$delta <ada>+$varhp hp<099>} };
+  #if { $varhp   < 0 } { #var delta {$delta <daa>$varhp hp<099>} };
+  #if { $varsp   > 0 } { #var delta {$delta <ada>+$varsp sp<099>} };
+  #if { $varsp   < 0 } { #var delta {$delta <daa>$varsp sp<099>} };
+  #if { $vargold > 0 } { #var delta {$delta <dda>+$vargold gold<099>} };
+  #if { $vargold < 0 } { #var delta {$delta <dda>$vargold gold<099>} };
+  #if { "$delta" != "" } { #showme {<$delta >} };
+
+  #nop ... and any extra trailing content grabbed by mistake;
+  #if { "$trailing != "" }  { #showme {> $trailing}};
 };
