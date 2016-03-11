@@ -101,7 +101,7 @@
     #format {charfile} {chars/%s} {$char};
     #nop the included charfile usually defines $name with exact casing and $pass;
     classincludefrom $charfile;
-    if { ! &name } {
+    #if { ! &name } {
       #var name {$char};
     };
     #nop default loginsequence is {$name;$pass;} - overrideable for specific mud;
@@ -234,4 +234,4 @@ libinclude maplib;
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-02-28
+#nop modif  date: 2016-03-11
