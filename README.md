@@ -49,4 +49,4 @@
   4. rename and edit the chars/samplechar.tt file to define a character for that mud
   5. cd back to the main installation directory and run from a console
 
-     > tinframe testmud
+     > ./tinframe testmud
