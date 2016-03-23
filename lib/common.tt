@@ -93,8 +93,10 @@
   #list charnames find {%1} index;
   #if { "%1" == "" || $index == 0 } { 
     #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
-    #echo {<020>loginas needs a character name for which a config file exists};
-    #echo {<040>possible chars: $allcharnames[1]<099>};
+    #delay .1 {
+      #echo {<020>loginas needs a character name for which a config file exists};
+      #echo {<040>possible chars: $allcharnames[1]<099>};
+    };
   };
   #nop otherwise login $char and recall its "memory" (map location, ...);
   #else {
