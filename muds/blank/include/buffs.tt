@@ -1,0 +1,4 @@
+#nop THIS IS A TEMPLATE
+
+buffon  {sneak} {Okay, you'll try to move silently for a while.} 
+buffoff {sneak} {You don't feel sneaky anymore.} 
