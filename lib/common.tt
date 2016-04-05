@@ -186,7 +186,6 @@
 #nop >>
 #nop << function key macros - <F12>:reload scripts and <F9>:connect to mud;
 #nop reload all scripts with F12 (saving temp stuff);
-#nop used to bed {\e[15~} for F5
 #macro {\e[24~} {
   #class temp write temp.tt;
   #class main kill;
