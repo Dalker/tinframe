@@ -14,9 +14,7 @@
   #variable currentmap %1;
   #format mapfile {maps/%s.map} {$currentmap};
   #format mclfile {maps/%s.tt}  {$currentmap};
-#nop   #class map open;
   #EVENT {MAP ENTER ROOM} {redrawmap};
-#nop   #class temp open;
 }
 
 #alias unsetmap {
@@ -73,7 +71,7 @@
     #if {"$temp[1]" != ""}{
       #echo {newmap: can't create map %1, file $tmp already exists!};
     };
-    #unvar $temp;
+    #unvar temp;
     #unvar tmp;
     #else {
       closemap;
@@ -98,8 +96,8 @@
     #script {temp} {ls $tmp};
     #if {"$temp[1]" == ""}{
       #echo {loadmap: can't find mapfile $tmp - aborting};
-      #unvar $temp;
-      #unvar $tmp;
+      #unvar temp;
+      #unvar tmp;
     };
 
     #else { #nop map asked for exists, continue;
@@ -123,7 +121,7 @@
         classincludefrom maps/$currentmap;
         #echo {loadmap: map class file found and loaded};
       };
-      #unvar $temp;
+      #unvar temp;
 
       #nop goto asked for map location (default = room 1);
       #if {"%2" != ""} {
