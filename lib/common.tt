@@ -21,6 +21,7 @@
 #nop - macro key <F9> to connect to mud (with 'loglog' of connection)
 #nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
 #nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
+#nop - buff status handling on status pane: 'buffon {buffname} {message}', 'buffoff {buffname} {message}', 'showbuffs'
 #nop and from included stdlib.tt:
 #nop - alias 'log [on|off]' to start/stop logging to dated file in log/
 #nop - function 'colscale{foo;bar}' for color based on foo/bar interpreted as a %
@@ -161,13 +162,37 @@
   #format {memfile} {%s%s%s} {chars/} {%1} {.mf};
   #system {rm $memfile 2> /dev/null};
 
+  #nop save buff information, if any;
+  #unvar thebuff;
+  #var thecount 0;
+  #while { $thecount < $thesize } {
+    #math thecount { $thecount + 1};
+    #list onbuffs get $thecount thebuff;
+    memalso {#list onbuffs sort {$thebuff};};
+  };
+  #list offbuffs size thesize;
+  #var thecount 0;
+  #while { $thecount < $thesize } {
+    #math thecount { $thecount + 1};
+    #list offbuffs get $thecount thebuff;
+    memalso {#list offbuffs sort {$thebuff};};
+  };
+  #if &thebuff {
+    memalso {showbuffs;};
+    #echo {memchar for $name: saved buff information};
+  };
+  #else {
+    #line log {$memfile} {#echo no buff information saved for %1};
+  };
+
+  #nop save map information, if any;
   #if { &mapfile } {
     #map get roomvnum lastvnum;
 
     #line log {$memfile} {#nop map last location recall for %1};
     #line log {$memfile} {loadmap $currentmap $lastvnum};
 
-    #echo {memchar for $name: $currentmap vnum $lastvnum};
+    #echo {memchar for $name: saved map $currentmap vnum $lastvnum};
   };
   #else {
     #line log {$memfile} {#echo no map information saved for %1};
@@ -192,7 +217,7 @@
   #read  main.tt;
   #if { &mclfile } { 
     #script {temp} {ls $mclfile};
-    #if {"$temp[1]" != ""}{
+    #if {"$temp[1]" != ""} {
        classincludefrom maps/$currentmap;
     };
   };
@@ -222,6 +247,94 @@
 #alias classincludefrom {#class %1 kill; #class %1 read %1.tt};
 #alias libinclude       {#class %1 kill; #class %1 read $libdir/%1.tt};
 #nop >>
+#nop << logging on/off buffs on status pane
+#var oncol {[38;5;2m}; #nop {#var oncol {[38;5;32m}};
+#var offcol {[38;5;8m};
+#var recol {[0;39;49m};
+#alias showbuffs {; #nop <<;
+  #nop first clear the status pane;
+  #var thecount 0;
+  #while { $thecount < 7 } {
+    #math thecount { $thecount + 1};
+    statlog { };
+  };
+  #nop then say if fighting;
+  #if &fighting {
+    statlog {FIGHTING $enemy};
+  };
+  #if &dead {
+    statlog {[38;5;3mDEAD};
+  };
+  #nop then fill it with the status of buffs;
+  #unvar temp;
+  #list buffs size thesize;
+  #var thecount 0;
+  #while { $thecount < $thesize } {
+    #math thecount { $thecount + 1};
+    #list buffs get $thecount thebuff;
+    #var found 0; #nop <- circumvents bug in #if;
+    #list onbuffs find {$thebuff} found;
+    #if &temp {
+      #if { $found > 0 } {
+        statlog {$temp$oncol$thebuff$recol};
+      }{
+        statlog {$temp$offcol$thebuff$recol};
+      };
+      #unvar temp;
+    } {
+      #if { $found > 0 } {
+        #format temp {%-25s} {$oncol$thebuff};
+      }{
+        #format temp {%-25s} {$offcol$thebuff};
+      };
+    };
+  };
+  #if &temp {
+      statlog {$temp$recol};
+  };
+    statlog { };
+}; #nop >>
+#alias buffon  {;#nop <<
+  #var found 0; #nop <- circumvents bug in #if;
+  #list buffs find {%1} found;
+  #if { $found == 0 } {
+    #list buffs sort {%1};
+  };
+  #unvar found;
+  #high {^%2} {<bda>};
+  #act {^%2} {
+    #list onbuffs find {%1} found;
+    #if { "$found" == "0" } {
+      #list onbuffs sort {%1};
+    };
+    #list offbuffs find {%1} found;
+    #if { $found > 0} {
+      #list offbuffs delete $found;
+    };
+    showbuffs;
+  };
+};*#nop >>
+#alias buffoff {;#nop <<
+  #var found 0;
+  #list buffs find {%1} found;
+  #if { $found == 0 } {
+    #list buffs sort {%1};
+  };
+  #unvar found;
+  #gag {^%2$};
+  #act {^%2$} {
+    #showme {<dab>%2 ${offcol}-> reactivate %1!};
+    #list offbuffs find {%1} found;
+    #if { "$found" == "0" } {
+      #list offbuffs sort {%1};
+    };
+    #list onbuffs find {%1} found;
+    #if { $found > 0} {
+      #list onbuffs delete $found;
+    };
+    showbuffs;
+  };#nop >>
+};#nop >>
 
 #nop -----------------------------------------
 #nop  Include secondary files
