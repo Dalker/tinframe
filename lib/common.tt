@@ -213,6 +213,7 @@
 #nop << function key macros - <F12>:reload scripts and <F9>:connect to mud;
 #nop reload all scripts with F12 (saving temp stuff);
 #macro {\e[24~} {
+  #echo {** Start reloading scripts **};
   #class temp write temp.tt;
   #class main kill;
   #read  main.tt;
@@ -221,8 +222,12 @@
     #if {"$temp[1]" != ""} {
        classincludefrom $mclfile;
     };
+    #else {
+      #echo {current map doesn't have an associated class};
+    };
   };
-};               
+  #echo {** Done reloading scripts **};
+};
 
 #nop  log in  with F9
 #macro {\e[20~} {#ses $mudname $mudhost $mudport};
