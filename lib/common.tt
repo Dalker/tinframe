@@ -3,16 +3,15 @@
 #nop -----------------------------------------
 #class lib kill
 #class lib open
-
-#nop What's expected of caller:
+#nop << What's expected of caller: (doc)
 #nop - caller is called 'main.tt' (for reloader macro F12)
 #nop - caller's dir has subdirs 'include/', 'chars/', 'map/' and 'log/'
 #nop - variables '$mudname' '$mudhost' and '$mudport' have been defined
 #nop - class 'temp' opened at the end of caller's script
 #nop - optionally: non-empty 'onconnect', 'onquit', 'prequit' and/or 'ontimeout' aliases have been defined
 #nop - optionally: 'loginsequence' alias has been overridden
-
-#nop What caller can expect from common.tt:
+#nop >>
+#nop << What caller can expect from common.tt: (doc)
 #nop - alias 'classinclude' to include files in include/
 #nop - alias 'classincludefrom' to include files from other dirs
 #nop - alias 'loginas' to login using a character defined on a chars/ .tt file and recall information about it
@@ -21,8 +20,6 @@
 #nop - macro key <F9> to connect to mud (with 'loglog' of connection)
 #nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
 #nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
-#nop - buff status handling on status pane: 'buffon {buffname} {message}', 'buffoff {buffname} {message}', 'showbuffs'
-#nop   -> rebuff hook available, to be overridden
 #nop and from included stdlib.tt:
 #nop - alias 'log [on|off]' to start/stop logging to dated file in log/
 #nop - function 'colscale{foo;bar}' for color based on foo/bar interpreted as a %
@@ -32,29 +29,38 @@
 #nop - automatic 'closemap' in 'quit' (before sending 'quit' to the mud)
 #nop - alias 'goto <dest>' and macro <F1> : set destination and walk there
 #nop - aliases 'mapsymbol', 'mapexit', 'mapname'
+#nop >>
 
-#nop << base config: packet patch, unicode
-#nop try to fight the garbled text bug from some muds;
-#config {packet patch} {0.5};
+#nop << base config: color patch, unicode
 #config {colour patch} {on};
 
 #nop make sure text is handled as Unicode by the client;
 #nop (may need setup server-side too);
 #config {charset} {utf-8};
-#nop >>
-#nop << handling of connection, disconnection and timing out - save map and call 'onconnect', 'onquit', 'prequit', 'ontimeout';
-#nop log network activity and call onconnect script;
 
+#nop try to fight the garbled text bug from some muds;
+#nop #config {packet patch} {0.5}; #nop <- should be set on a per mud basis
+#nop >>
+#nop -----------------------------------------
+#nop session handling: connection, activation, disconnection and timing out: 
+#nop -----------------------------------------
+#nop << auto-set $activesession, auto-save map, log connection/disconnection and call 'onconnect', 'onquit', ...;
 #alias fetchdate {#script thedate {date +"%Y.%m.%d - %H:%M"}}
 #event {SESSION CONNECTED}{
+ #var activesession %0;
  fetchdate;
  loglog {* * * connected to $mudname on $thedate[1] * * *};
+ #unvar thedate;
  onconnect; #nop may contain loginas and/or recallmem;
 }
+#event {SESSION ACTIVATED} {
+  #var activesession %0;
+} 
 
 #event {SESSION DISCONNECTED}{
  fetchdate;
  loglog {* * * disconnected from $mudname on $thedate[1] * * *};
+ #unvar thedate;
  onquit; #nop typically contains memmap - so must be done *before* closing map;
  #if &mapfile {
    closemap;
@@ -67,6 +73,7 @@
 #event {SESSION TIMED OUT}{
  fetchdate;
  loglog {* * * timed out from $mudname on $thedate[1] * * *};
+ #unvar thedate;
  ontimeout; #nop normally calls 'onquit', but can be overridden;
  #if &mapfile {
    closemap;
@@ -75,11 +82,8 @@
  posttimeout; #nop normally calls 'postquit', but can be overridden;
  #nop note that *after* this, session data is definitely lost;
 }
-
-#alias onconnect {
-  #nop override this alias on mud tt file if necessary;
-}
-
+#nop >>
+#nop << auxiliary functions for 'onquit', 'onconnect' and friends : memchar, memalso, recallchar;
 #nop << 'loginas' alias and default login sequence 
 #alias loginsequence {
   #nop override this alias on mud tt file if necessary;
@@ -92,6 +96,7 @@
 
   #nop show available chars if no char or non-existant char asked for;
   #script {charnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt##};
+  #var index 0;
   #list charnames find {%1} index;
   #if { "%1" == "" || $index == 0 } { 
     #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
@@ -100,6 +105,7 @@
       #echo {<040>possible chars: $allcharnames[1]<099>};
     };
   };
+  #unvar index;
   #nop otherwise login $char and recall its "memory" (map location, ...);
   #else {
     #format {charfile} {chars/%s} {$char};
@@ -117,11 +123,50 @@
   };
 };
 #nop >>
+#alias memchar {
+  #format {memfile} {%s%s%s} {chars/} {%1} {.mf};
+  #system {rm $memfile 2> /dev/null};
+
+  #nop save map information, if any;
+  #if { &mapfile } {
+    #map get roomvnum lastvnum;
+
+    #line log {$memfile} {#nop map last location recall for %1};
+    #line log {$memfile} {loadmap $currentmap $lastvnum};
+
+    #echo {memchar for $name: saved map $currentmap vnum $lastvnum};
+  };
+  #else {
+    #line log {$memfile} {#echo no map information saved for %1};
+  };
+};
+
+#alias memalso {
+  #line log {$memfile} {%1};
+};
+
+#alias recallchar {
+  #format {memfile} {%s%s%s} {chars/} {%1} {.mf};
+  #read {$memfile};
+  #echo {recalled memfile for %1};
+};
+#nop >>
+#nop << default versions of 'onconnect', 'prequit', 'quit' override, 'onquit', 'postquit', 'ontimeout', 'posttimeout';
+
+#alias onconnect {
+  #nop override this alias on mud tt file if necessary;
+}
 
 #alias prequit {
   #nop stuff to be done before 'quit' command is sent to mud;
   #nop override this alias on mud tt file if necessary;
 }
+
+#alias quit {
+  #nop delay actual quit in case 'prequit' script needs to do some stuff before;
+  #delay .2 {#send quit};
+  prequit;
+};
 
 #alias onquit {
   #nop stuff to be done before map is closed;
@@ -151,65 +196,47 @@
   #nop override this alias on mud tt file if necessary;
   postquit;
 }
+#nop >>
+#nop << 'loginas' alias and default login sequence (to be actioned from specific mud's login screen detection) 
+#alias loginsequence {
+  #nop override this alias on mud tt file if necessary;
+  $name;
+  $pass;
+}
+#alias loginas {
+  #nop $char is used for filenames;
+  #var char {%1};
 
-#alias quit {
-  #nop delay actual quit in case 'prequit' script needs to do some stuff before;
-  #delay .2 {#send quit};
-  prequit;
+  #nop show available chars if no char or non-existant char asked for;
+  #script {charnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt##};
+  #var index 0;
+  #list charnames find {%1} index;
+  #if { "%1" == "" || $index == 0 } { 
+    #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
+    #delay .1 {
+      #echo {<020>loginas needs a character name for which a config file exists};
+      #echo {<040>possible chars: $allcharnames[1]<099>};
+    };
+  };
+  #unvar index;
+  #nop otherwise login $char and recall its "memory" (map location, ...);
+  #else {
+    #format {charfile} {chars/%s} {$char};
+    #nop the included charfile usually defines $name with exact casing and $pass;
+    classincludefrom $charfile;
+    #if { ! &name } {
+      #var name {$char};
+    };
+    #nop default loginsequence is {$name;$pass;} - overrideable for specific mud;
+    loginsequence;
+    #nop character's memorized map and other variables are recalled;
+    recallchar $char;
+    loglog {<024>Logged in as $name<099>};
+    #class temp open;
+  };
 };
 #nop >>
-#nop << auxiliary functions to be called from 'onquit', 'onconnect' and friends : memchar, memalso, recallchar;
-#alias memchar {
-  #format {memfile} {%s%s%s} {chars/} {%1} {.mf};
-  #system {rm $memfile 2> /dev/null};
 
-  #nop save buff information, if any;
-  #unvar thebuff;
-  #var thecount 0;
-  #while { $thecount < $thesize } {
-    #math thecount { $thecount + 1};
-    #list onbuffs get $thecount thebuff;
-    memalso {#list onbuffs sort {$thebuff};};
-  };
-  #list offbuffs size thesize;
-  #var thecount 0;
-  #while { $thecount < $thesize } {
-    #math thecount { $thecount + 1};
-    #list offbuffs get $thecount thebuff;
-    memalso {#list offbuffs sort {$thebuff};};
-  };
-  #if &thebuff {
-    memalso {showbuffs;};
-    #echo {memchar for $name: saved buff information};
-  };
-  #else {
-    #line log {$memfile} {#echo no buff information saved for %1};
-  };
-
-  #nop save map information, if any;
-  #if { &mapfile } {
-    #map get roomvnum lastvnum;
-
-    #line log {$memfile} {#nop map last location recall for %1};
-    #line log {$memfile} {loadmap $currentmap $lastvnum};
-
-    #echo {memchar for $name: saved map $currentmap vnum $lastvnum};
-  };
-  #else {
-    #line log {$memfile} {#echo no map information saved for %1};
-  };
-};
-
-#alias memalso {
-  #line log {$memfile} {%1};
-};
-
-#alias recallchar {
-  #format {memfile} {%s%s%s} {chars/} {%1} {.mf};
-  #read {$memfile};
-  #echo {recalled memfile for %1};
-};
-#nop >>
 #nop << function key macros - <F12>:reload scripts and <F9>:connect to mud;
 #nop reload all scripts with F12 (saving temp stuff);
 #macro {\e[24~} {
@@ -225,6 +252,7 @@
     #else {
       #echo {current map doesn't have an associated class};
     };
+    #unvar temp;
   };
   #echo {** Done reloading scripts **};
 };
@@ -248,101 +276,15 @@
   #line log map.txt %0;
 };
 #nop >>
+
+#nop -----------------------------------------
+#nop  Include other tintin class files
+#nop -----------------------------------------
 #nop << aliases 'classinclude', 'classincludefrom' and 'libinclude';
 #alias classinclude     {#class %1 kill; #class %1 read include/%1.tt};
 #alias classincludefrom {#class %1 kill; #class %1 read %1.tt};
 #alias libinclude       {#class %1 kill; #class %1 read $libdir/%1.tt};
 #nop >>
-#nop << logging on/off buffs on status pane
-#var oncol {[38;5;2m}; #nop {#var oncol {[38;5;32m}};
-#var offcol {[38;5;8m};
-#var recol {[0;39;49m};
-#alias showstatus {#nop {}}; #nop placeholder for status hook;
-#alias showbuffs {; #nop <<;
-  #nop first clear the status pane;
-  #var thecount 0;
-  #while { $thecount < 7 } {
-    #math thecount { $thecount + 1};
-    statlog { };
-  };
-  #nop then call status hook;
-  showstatus;
-  #nop then status pane with the status of buffs;
-  #unvar temp;
-  #list buffs size thesize;
-  #var thecount 0;
-  #while { $thecount < $thesize } {
-    #math thecount { $thecount + 1};
-    #list buffs get $thecount thebuff;
-    #var found 0; #nop <- circumvents bug in #if;
-    #list onbuffs find {$thebuff} found;
-    #if &temp {
-      #if { $found > 0 } {
-        statlog {$temp$oncol$thebuff$recol};
-      }{
-        statlog {$temp$offcol$thebuff$recol};
-      };
-      #unvar temp;
-    } {
-      #if { $found > 0 } {
-        #format temp {%-25s} {$oncol$thebuff};
-      }{
-        #format temp {%-25s} {$offcol$thebuff};
-      };
-    };
-  };
-  #if &temp {
-      statlog {$temp$recol};
-  };
-    statlog { };
-}; #nop >>
-#alias buffon  {;#nop <<
-  #var found 0; #nop <- circumvents bug in #if;
-  #list buffs find {%1} found;
-  #if { $found == 0 } {
-    #list buffs sort {%1};
-  };
-  #unvar found;
-  #high {^%2} {<bda>};
-  #act {^%2} {
-    #list onbuffs find {%1} found;
-    #if { "$found" == "0" } {
-      #list onbuffs sort {%1};
-    };
-    #list offbuffs find {%1} found;
-    #if { $found > 0} {
-      #list offbuffs delete $found;
-    };
-    showbuffs;
-  };
-}; #nop >>
-#alias rebuff {#nop {}}; #nop placeholder for rebuff hook;
-#alias buffoff {;#nop <<
-  #var found 0;
-  #list buffs find {%1} found;
-  #if { $found == 0 } {
-    #list buffs sort {%1};
-  };
-  #unvar found;
-  #gag {^%2$};
-  #act {^%2$} {
-    #showme {<dab>%2 ${offcol}-> reactivate %1!};
-    rebuff {%1};
-    #list offbuffs find {%1} found;
-    #if { "$found" == "0" } {
-      #list offbuffs sort {%1};
-    };
-    #list onbuffs find {%1} found;
-    #if { $found > 0} {
-      #list onbuffs delete $found;
-    };
-    showbuffs;
-  };
-};#nop >>
-
-#nop -----------------------------------------
-#nop  Include secondary files
-#nop -----------------------------------------
 libinclude stdlib;
 libinclude maplib;
 
