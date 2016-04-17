@@ -92,6 +92,20 @@
     showstatus;
 }
 #nop >>
+#nop << flagif{flag}{trigger}, unflagif{flag}{trigger};
+#alias flagif {
+  #high {^%2} {<bad>};
+  #act {^%2} {
+    flagon {%1};
+  };
+};
+#alias unflagif {
+  #high {^%2} {<bad>};
+  #act {^%2} {
+    flagoff {%1};
+  };
+};
+#nop >>
 
 #nop buff status handling
 #nop << autobuff{name}{minmana}, custombuff{name}{action}
@@ -105,52 +119,69 @@
 #nop << stopbuff{name} -- removes buff from auto-rebuff table 
 #alias stopbuff {
   #unvar autobuffs[%1];
+  showstatus;
 }
 #nop >>
-
-#nop buffon/buffoff {buffname} {trigger pattern}, ambuffon/ambuffoff {buff1} {buff1} {trigger}
-#nop << buffon, buffoff and their 'ambiguous' counterparts for creating on/off buff detectors;
+#nop << tossbuff{name} -- removes buff from all tables
+#alias tossbuff {
+  #unvar autobuffs[%1];
+  #unvar dispbuffs[%1];
+  #unvar activebuffs[%1];
+  #unvar custombuffs[%1];
+  #unvar queuedbuffs[%1];
+  showstatus;
+}
+#nop >>
+#nop << buffon/buffoff {buffname} - make buff active/inactive;
 #alias buffon {
-  #high {^%2} {<bda>};
-  #nop create action to detect buff went on;
-  #act {^%2} {
+  #if {"%1" == ""} {
+    #echo {> buffon needs a flag name <};
+  }{
     #nop add buff to display list, in case it wasn't there yet;
     #var dispbuffs[%1] {1};
     #nop add buff to active buffs list;
     #var activebuffs[%1] {on};
     #unvar queuedbuffs[%1];
     showstatus;
+  }
+}
+#alias buffoff {
+  #if {"%1" == ""} {
+    #echo {> buffoff needs a flag name <};
+  }{
+    #nop add buff to display list, in case it wasn't there yet;
+    #var dispbuffs[%1] {1};
+    #nop remove buff from active buffs list;
+    #unvar activebuffs[%1];
+    #if {&autobuffs[%1]} {
+      rebuff {%1};
+    };
+    showstatus;
+  }
+}
+#nop >>;
+#nop << buffif, buffoff and their 'ambiguous' counterparts for creating on/off buff detectors;
+#alias buffif {
+  #high {^%2} {<bda>};
+  #nop create action to detect buff went on;
+  #act {^%2} {
+    buffon {%1};
   };
 };
-#alias buffoff {
+#alias unbuffif {
   #high {^%2} {<bda>};
   #nop create action to detect buff went off;
   #act {^%2} {
-    #nop remove buff from active buffs list;
-    #unvar activebuffs[%1];
-    #nop add buff to display list, in case it wasn't there yet;
-    #var dispbuffs[%1] {1};
-    showstatus;
-    #if {&autobuffs[%1]} {
-      rebuff {%1};
-    };
+    buffoff {%1};
   };
 };
-#alias ambuffoff {
+#alias ambunbuffif {
   #high {^%3} {<bda>};
   #nop create action to detect buff went on;
   #act {^%3} {
-    #nop remove buff from active buffs list;
-    #unvar activebuffs[%1];
-    #unvar activebuffs[%2];
+    buffoff {%1};
+    buffoff {%2};
     #echo {> ambuffoff warning: can't know which of '%1' or '%2' buff went off <};
-    showstatus;
-    #if {&autobuffs[%1]} {
-      rebuff {%1};
-    };
-    #if {&autobuffs[%2]} {
-      rebuff {%2};
-    };
   };
 };
 #nop >>;
