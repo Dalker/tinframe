@@ -32,7 +32,7 @@
 #nop >>
 
 #nop << base config: color patch, unicode
-#config {colour patch} {on};
+#config {color patch} {on};
 
 #nop make sure text is handled as Unicode by the client;
 #nop (may need setup server-side too);
@@ -41,6 +41,7 @@
 #nop try to fight the garbled text bug from some muds;
 #nop #config {packet patch} {0.5}; #nop <- should be set on a per mud basis
 #nop >>
+
 #nop -----------------------------------------
 #nop session handling: connection, activation, disconnection and timing out: 
 #nop -----------------------------------------
@@ -55,6 +56,7 @@
 }
 #event {SESSION ACTIVATED} {
   #var activesession %0;
+  onactive;
 } 
 
 #event {SESSION DISCONNECTED}{
@@ -108,9 +110,10 @@
   #unvar index;
   #nop otherwise login $char and recall its "memory" (map location, ...);
   #else {
-    #format {charfile} {chars/%s} {$char};
+#nop {    #format {charfile} {chars/%s} {$char}; };
+#nop     classincludefrom $charfile;
+    subclassinclude {chars} {$char};
     #nop the included charfile usually defines $name with exact casing and $pass;
-    classincludefrom $charfile;
     #if { ! &name } {
       #var name {$char};
     };
@@ -154,6 +157,10 @@
 #nop << default versions of 'onconnect', 'prequit', 'quit' override, 'onquit', 'postquit', 'ontimeout', 'posttimeout';
 
 #alias onconnect {
+  #nop override this alias on mud tt file if necessary;
+}
+
+#alias oncactive {
   #nop override this alias on mud tt file if necessary;
 }
 
@@ -244,16 +251,6 @@
   #class temp write temp.tt;
   #class main kill;
   #read  main.tt;
-  #if { &mclfile } { 
-    #script {temp} { ls $mclfile 2> /dev/null };
-    #if {"$temp[1]" != ""} {
-       classincludefrom $mclfile;
-    };
-    #else {
-      #echo {current map doesn't have an associated class};
-    };
-    #unvar temp;
-  };
   #echo {** Done reloading scripts **};
 };
 
@@ -269,8 +266,9 @@
 #alias chatlog {
   #line log $chatfile %0;
 };
+#var statfile {status.txt};
 #alias statlog {
-  #line log status.txt %0;
+  #line log $statfile %0 ;
 };
 #alias maplog {
   #line log map.txt %0;
@@ -283,15 +281,48 @@
 #nop << aliases 'classinclude', 'classincludefrom' and 'libinclude';
 #alias classinclude     {#class %1 kill; #class %1 read include/%1.tt};
 #alias classincludefrom {#class %1 kill; #class %1 read %1.tt};
+#alias subclassinclude  {#class %2 kill; #class %2 read %1/%2.tt};
 #alias libinclude       {#class %1 kill; #class %1 read $libdir/%1.tt};
 #nop >>
+#nop << include library and local classes
 libinclude stdlib;
 libinclude maplib;
+libinclude statuslib;
+#echo {classes lib, stdlib, maplib and statuslib (re)loaded};
 
-#echo {classes lib, stdlib and maplib (re)loaded};
-#class main open
+#nop (re)load local include classes;
+#script {localincludes} {cd include; ls *.tt | sed -e "s/.tt$//"};
+#var included {};
+#foreach $localincludes[] index {
+  classinclude $localincludes[$index];
+  #var included {$included $localincludes[$index]};
+};
+#echo {included local classes: $included};
+#unvar localincludes;
+#unvar index;
+#unvar included;
 
-#nop------------------------
+#nop (re)load character's class file, if any;
+#if {&char} { 
+  subclassinclude {chars} {$char};
+} {
+  #echo {no char defined yet};
+};
+
+#nop (re)load map class file, if any;
+#if { &mclfile } {
+  #script {temp} { ls $mclfile 2> /dev/null };
+  #if {"$temp[1]" != ""} {
+     classincludefrom $mclfile;
+  };
+  #else {
+    #echo {current map doesn't have an associated class};
+  };
+  #unvar temp;
+};
+#nop >>
+
+#nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-04-06
+#nop modif  date: 2016-04-14

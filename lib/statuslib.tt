@@ -1,0 +1,161 @@
+#nop .-----------------.
+#nop |   status log    |
+#nop .-----------------.
+
+#nop associative tables: statusflags, dispbuffs, activebuffs, autobuffs, queuedbuffs, custombuffs;
+#nop << make sure the hashes exist - but make sure they don't get killed when reloading class;
+#nop these lists must live in 'temp', so that they don't get erased when reloading the libs;
+#class temp open;
+#if {&statusflags} {#nop;} {#var statusflags {}};
+#if {&dispbuffs}   {#nop;} {#var dispbuffs   {}};
+#if {&activebuffs} {#nop;} {#var activebuffs {}};
+#if {&autobuffs}   {#nop;} {#var autobuffs   {}};
+#if {&queuedbuffs} {#nop;} {#var queuedbuffs {}};
+#if {&custombuffs} {#nop;} {#var queuedbuffs {}};
+#class statuslib open;
+#nop >>;
+
+#nop displaying in status pane
+#nop << showstatus
+#nop colors for on/off buffs (can be overrridden);
+#var oncol {[38;5;2m};
+#var offcol {[38;5;8m};
+#var recol {[0;39;49m};
+
+#alias showstatus {
+  #nop first clear the status pane;
+  #var thecount 0;
+  #while { $thecount < 7 } {
+    #math thecount { $thecount + 1};
+    statlog { };
+  };
+  #nop then display the status flags line;
+  #var flagline {};
+  #foreach {$statusflags[]} {flag} {
+    #format flagline {%s%u } {$flagline} {$flag};
+  };
+  statlog {$flagline }; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  #nop finally display the buffs;
+  #unvar temp;
+  #foreach {$dispbuffs[]} {buff} {
+    #if {&activebuffs[$buff]} {
+      #var nextbuff {$oncol$buff};
+    }{
+      #var nextbuff {$offcol$buff};
+    };
+    #if {&tempc} {
+      statlog {$templ$tempc$nextbuff$recol};
+      #unvar tempc;
+      #unvar templ;
+    }; 
+    #elseif {&templ} {
+      #format tempc {%-20s} {$nextbuff};
+    };
+    #else {
+      #format templ {%-20s} {$nextbuff};
+    };
+  };
+  #if &templ {
+    #if &tempc {
+      statlog {$templ$tempc$recol};
+    } {
+      statlog {$templ$recol};
+    };
+    #unvar tempc;
+    #unvar templ;
+  };
+  statlog { };
+};
+#nop >>;
+
+#nop status flags handling;
+#nop << flagon{flag}, flagoff{flag}, clearflags{} (means clear all);
+#nop define the "methods";
+#alias flagon {
+  #if {"%1" == ""} {
+    #echo {> flagon needs a flag name <};
+  }{
+    #var statusflags[%1] = on;
+    showstatus;
+  }
+}
+#alias flagoff {
+  #if {"%1" == ""} {
+    #echo {> flagoff needs a flag name <};
+  }{
+    #unvar statusflags[%1];
+    showstatus;
+  }
+}
+#alias clearflags {
+  #var statusflag {};
+    showstatus;
+}
+#nop >>
+
+#nop buff status handling
+#nop << autobuff{name}{minmana}, custombuff{name}{action}
+#alias autobuff {
+  #var autobuffs[%1] {%2};
+}
+#alias custombuff {
+  #var custombuffs[%1] {%2};
+}
+#nop >>
+#nop << stopbuff{name} -- removes buff from auto-rebuff table 
+#alias stopbuff {
+  #unvar autobuffs[%1];
+}
+#nop >>
+
+#nop buffon/buffoff {buffname} {trigger pattern}, ambuffon/ambuffoff {buff1} {buff1} {trigger}
+#nop << buffon, buffoff and their 'ambiguous' counterparts for creating on/off buff detectors;
+#alias buffon {
+  #high {^%2} {<bda>};
+  #nop create action to detect buff went on;
+  #act {^%2} {
+    #nop add buff to display list, in case it wasn't there yet;
+    #var dispbuffs[%1] {1};
+    #nop add buff to active buffs list;
+    #var activebuffs[%1] {on};
+    #unvar queuedbuffs[%1];
+    showstatus;
+  };
+};
+#alias buffoff {
+  #high {^%2} {<bda>};
+  #nop create action to detect buff went off;
+  #act {^%2} {
+    #nop remove buff from active buffs list;
+    #unvar activebuffs[%1];
+    #nop add buff to display list, in case it wasn't there yet;
+    #var dispbuffs[%1] {1};
+    showstatus;
+    #if {&autobuffs[%1]} {
+      rebuff {%1};
+    };
+  };
+};
+#alias ambuffoff {
+  #high {^%3} {<bda>};
+  #nop create action to detect buff went on;
+  #act {^%3} {
+    #nop remove buff from active buffs list;
+    #unvar activebuffs[%1];
+    #unvar activebuffs[%2];
+    #echo {> ambuffoff warning: can't know which of '%1' or '%2' buff went off <};
+    showstatus;
+    #if {&autobuffs[%1]} {
+      rebuff {%1};
+    };
+    #if {&autobuffs[%2]} {
+      rebuff {%2};
+    };
+  };
+};
+#nop >>;
+
+#nop ------------------------
+#nop CopyLeft by dalker
+#nop create date: 2016-04-14
+#nop modif  date: 2016-04-17
