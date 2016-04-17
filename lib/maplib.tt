@@ -282,7 +282,7 @@ moveforreal
 #nop >>
 
 #nop #echo {class maplib (re)loaded};
-#nop------------------------
+#nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
 #nop modif  date: 2016-03-06
