@@ -75,7 +75,7 @@
   #if {"%1" == ""} {
     #echo {> flagon needs a flag name <};
   }{
-    #var statusflags[%1] = on;
+    #var {statusflags[%1]} {on};
     showstatus;
   }
 }
