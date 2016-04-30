@@ -11,7 +11,8 @@
 #if {&activebuffs} {#nop;} {#var activebuffs {}};
 #if {&autobuffs}   {#nop;} {#var autobuffs   {}};
 #if {&queuedbuffs} {#nop;} {#var queuedbuffs {}};
-#if {&custombuffs} {#nop;} {#var queuedbuffs {}};
+#if {&custombuffs} {#nop;} {#var custombuffs {}};
+#if {&statusprops} {#nop;} {#var statusprops {}};
 #class statuslib open;
 #nop >>;
 
@@ -35,6 +36,12 @@
     #format flagline {%s%u } {$flagline} {$flag};
   };
   statlog {$flagline }; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  #nop then display the properties line;
+  #var propline {};
+  #foreach {$statusprops[]} {prop} {
+    #format propline {%s%s  } {$propline} {$prop: $statusprops[$prop]};
+  };
+  statlog {$propline }; #nop make sure this is not empty! (vs bug of capturing next from main pane);
   #nop finally display the buffs;
   #unvar temp;
   #foreach {$dispbuffs[]} {buff} {
@@ -88,7 +95,7 @@
   }
 }
 #alias clearflags {
-  #var statusflag {};
+  #var statusflags {};
     showstatus;
 }
 #nop >>
@@ -105,6 +112,28 @@
     flagoff {%1};
   };
 };
+#nop >>
+
+#nop status property handling;
+#nop << statusprop{key}{val}, statuspropclear{key};
+#nop define the "methods";
+#alias statusprop {
+  #if {"%1" == ""} {
+    #echo {> statusprop needs a property name <};
+  }{
+    #var {statusprops[%1]} {%2};
+    showstatus;
+  };
+}
+#alias statuspropclear {
+  #if {"%1" == ""} {
+    #var statusprops {};
+    showstatus;
+  }{
+    #unvar {statusprops[%1]};
+    showstatus;
+  };
+}
 #nop >>
 
 #nop buff status handling
@@ -189,4 +218,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-04-17
+#nop modif  date: 2016-04-29
