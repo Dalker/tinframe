@@ -44,7 +44,9 @@
   2.  make a copy of the blank mud template: starting at the installation root:
 
       > cd muds
+
       > cp -ri blank testmud
+
       > cd testmud
 
   3. edit the three mandatory lines on the main.tt file that define the mud's name, address and port
