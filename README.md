@@ -35,6 +35,8 @@
 
   Finally, if keypad is used for motion (without numlock), then the numpad '**/**' key switches between two modes: moving for real (on mud) or moving on map (meaning on map only, not fo real). This is useful when adding map symbols and names, connecting rooms 'by hand', inserting void rooms, etc...
 
+* a status pane can be used to display flags, properties and buff status - see statuslib.tt for details
+
 * Easiest way to install and try it:
   1.  cd on a console to some convenient place for installation and
 
