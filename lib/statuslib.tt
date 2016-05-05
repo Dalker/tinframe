@@ -19,9 +19,12 @@
 #nop displaying in status pane
 #nop << showstatus
 #nop colors for on/off buffs (can be overrridden);
-#var oncol {[38;5;2m};
-#var offcol {[38;5;8m};
-#var recol {[0;39;49m};
+#var oncol  {$cgreen};
+#var offcol {$cgray}; 
+#var keycol {$clblue};
+#var valcol {$cyellow};
+#var flcol  {$ccyan};
+#var recol  {$cwhite};
 
 #alias showstatus {
   #nop first clear the status pane;
@@ -31,17 +34,17 @@
     statlog { };
   };
   #nop then display the status flags line;
-  #var flagline {};
+  #var flagline {$flcol};
   #foreach {$statusflags[]} {flag} {
     #format flagline {%s%u } {$flagline} {$flag};
   };
-  statlog {$flagline }; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  statlog {$flagline$recol}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
   #nop then display the properties line;
   #var propline {};
   #foreach {$statusprops[]} {prop} {
-    #format propline {%s%s  } {$propline} {$prop: $statusprops[$prop]};
+    #format propline {%s%s  } {$propline} {$keycol$prop: $valcol$statusprops[$prop]};
   };
-  statlog {$propline }; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  statlog {$propline$recol};
   #nop finally display the buffs;
   #unvar temp;
   #foreach {$dispbuffs[]} {buff} {
@@ -75,7 +78,7 @@
 };
 #nop >>;
 
-#nop status flags handling;
+#nop flag status handling;
 #nop << flagon{flag}, flagoff{flag}, clearflags{} (means clear all);
 #nop define the "methods";
 #alias flagon {
@@ -114,18 +117,18 @@
 };
 #nop >>
 
-#nop status property handling;
-#nop << statusprop{key}{val}, statuspropclear{key};
+#nop property status handling;
+#nop << sproperty{key}{val}, spropclear{key};
 #nop define the "methods";
-#alias statusprop {
+#alias sproperty {
   #if {"%1" == ""} {
-    #echo {> statusprop needs a property name <};
+    #echo {> sprop needs a property name <};
   }{
     #var {statusprops[%1]} {%2};
     showstatus;
   };
 }
-#alias statuspropclear {
+#alias spropclear {
   #if {"%1" == ""} {
     #var statusprops {};
     showstatus;
@@ -218,4 +221,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-04-29
+#nop modif  date: 2016-05-05

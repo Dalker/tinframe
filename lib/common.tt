@@ -288,6 +288,24 @@
   #line log map.txt %0;
 };
 #nop >>
+#nop << console colors, for use with standard logs;
+#var cblack   {[38;5;0m};
+#var cred     {[38;5;1m};
+#var cgreen   {[38;5;2m};
+#var cyellow  {[38;5;3m};
+#var cblue    {[38;5;4m};
+#var cmagenta {[38;5;5m};
+#var ccyan    {[38;5;6m};
+#var cwhite   {[38;5;7m};
+#var cgray    {[38;5;8m};
+#var clred    {[38;5;9m};
+#var clgreen  {[38;5;10m};
+#var clyellow {[38;5;11m};
+#var clblue   {[38;5;12m};
+#var clmagenta {[38;5;13m};
+#var clcyan   {[38;5;14m};
+#var clwhite  {[38;5;15m};
+#nop >>
 
 #nop -----------------------------------------
 #nop  Include other tintin class files
