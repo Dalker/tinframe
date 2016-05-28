@@ -24,11 +24,6 @@
   6. read TinFrame help within TinTin++ with the **tfhelp** alias
   7. login with **[F9]**
 
-* two layouts are provided, called by the shell scripts *tinframe* and *tinframe2*:
-  * **tinframe** is meant for wider screens. In its main window the main pane receives mud output, with two lines reserved at the bottom for prompt information. On top of that a few lines with the same width are meant to receive copies of any chat lines (chat detection script to be configured per-mud based on a template). To the right, a fixed-width pane shows an automatic map (started with the **newmap** alias), some logged information (connection/diconnection times, plus other information to be configured per-mud based on a template), and a third optional 'status' zone which may be configured mud-wise, e.g. to display buff status. A second tmux window is present in the background providing easy access to a terminal in the right directory for mud-specific scripting and/or note-taking (how to access it depends on local tmux keyboard configuration).
-  * **tinframe2** is meant for smaller screens. The contents of tinframe's main tmux window are split between two tmux windows: the first one has the main mud output and chat zone, the second one has the map and everything else.
-  * both of these scripts will look for the tinframe lib scripts at a location *../../lib* relative to the mud specific scripts, or at *$TFLIBDIR* if this environment variable exists; also, they assume mud-specific configuration is at *./muds*, unless *$TFMUDSDIR* variable environment exists
-
 * the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than *"$user;$pass"*. Logging in with the **loginas** alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis: **sessionhelp** for details
 
 * the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities: **maphelp** for details
@@ -37,3 +32,7 @@
 
 * various information is logged, some automatically, some manually: **loghelp** for details
 
+* two layouts are provided, called by the shell scripts *tinframe* and *tinframe2*:
+  * **tinframe** is meant for wider screens. In its main window the main pane receives mud output, with two lines reserved at the bottom for prompt information. On top of that a few lines with the same width are meant to receive copies of any chat lines (chat detection script to be configured per-mud based on a template). To the right, a fixed-width pane shows an automatic map (started with the **newmap** alias), some logged information (connection/diconnection times, plus other information to be configured per-mud based on a template), and a third optional 'status' zone which may be configured mud-wise, e.g. to display buff status. A second tmux window is present in the background providing easy access to a terminal in the right directory for mud-specific scripting and/or note-taking (how to access it depends on local tmux keyboard configuration).
+  * **tinframe2** is meant for smaller screens. The contents of tinframe's main tmux window are split between two tmux windows: the first one has the main mud output and chat zone, the second one has the map and everything else.
+  * both of these scripts will look for the tinframe lib scripts at a location *../../lib* relative to the mud specific scripts, or at *$TFLIBDIR* if this environment variable exists; also, they assume mud-specific configuration is at *./muds*, unless *$TFMUDSDIR* variable environment exists
