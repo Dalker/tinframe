@@ -1,6 +1,13 @@
 #nop THIS IS A TEMPLATE
 
 #nop -----------------------------------------
+#nop  Extra aliases if mud doesn't use them
+#nop -----------------------------------------
+#alias mu {#map undo}
+#alias ml {#map leave}
+#alias mr {#map return}
+
+#nop -----------------------------------------
 #nop  Possible entry points to the map
 #nop -----------------------------------------
 
@@ -10,5 +17,4 @@
 #nop   Map move auto-undos
 #nop -----------------------------------------
 
-#alias mu {#map undo}
 #act {^Alas, you cannot go that way.} {#map undo}
