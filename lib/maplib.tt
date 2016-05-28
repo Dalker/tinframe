@@ -3,7 +3,22 @@
 #nop -----------------------------------------
 #alias maphelp { #nop << help alias;
     #echo {--- TinFrame map handling --- };
-    #echo { };
+    #echo {redrawmap               : redraw map           (usually automatic)};
+    #echo {savemap                 : save map             (usually automatic)};
+    #echo {closemap                : close map, saving it (usually automatic)};
+    #echo {tossmap                 : close map without saving it};
+    #echo {newmap <name>           : create new map};
+    #echo {loadmap <name> [room]   : load existing map, with optional room (else room 1)};
+    #echo {maptransition};
+    #echo {     <dir> <map> [room] : create transition to other map <map> in direction <dir>};
+    #echo {goto <room>             : set path to <room>};
+    #echo {<Num*>                  : walk on path set by 'goto'};
+    #echo {mapsymbol <symbol>      : set room symbol, or clear it if <symbol>=clear};
+    #echo {mapname   <symbol>      : set room name, or clear it if <name>=clear};
+    #echo {mapexit <dir> hide      : hide exit in direction <dir>};
+    #echo {mapexit <dir> void      : make exit in direction <dir> void};
+    #echo {mapexit <dir> <command> : send <command> when walking in direction <dir>};
+    #echo {<Num/>                  : toggle between numpad real motion / fake motion on map only};
 };
 #nop >>;
 #nop $currentmap will hold the current map name
@@ -290,4 +305,4 @@ moveforreal
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-03-06
+#nop modif  date: 2016-05-28

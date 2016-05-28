@@ -3,7 +3,18 @@
 #nop .-----------------.
 #alias statushelp { #nop << help alias;
     #echo {--- TinFrame status pane handling --- };
-    #echo { };
+    #echo {showstatus              : update status pane (usually automatic) };
+    #echo {flagon/flagoff <flag>   : set or clear a flag};
+    #echo {clearflags              : clear all flags};
+    #echo {flagif <flag> <trigger> : flagon  on ^trigger mud line};
+    #echo {unflagif <flag> <trig>  : flagoff on ^trig    mud line};
+    #echo {sproperty <key> <value> : set property key->value};
+    #echo {spropclear <key>        : clear a property, or all if no key given};
+    #echo {buffon/buffoff <buff>   : set buff as active/inactive};
+    #echo {buffif <buff> <trigger> : buffon  on ^trigger mud line};
+    #echo {unbuffif <buff> <trig>  : buffoff on ^trig    mud line};
+    #echo {tossbuff <buff>         : remove buff from all lists};
+    #echo {autobuff/custombuff/stopbuff - partially implemented for bot-allowing muds};
 };
 #nop >>;
 
@@ -146,30 +157,6 @@
 #nop >>
 
 #nop buff status handling
-#nop << autobuff{name}{minmana}, custombuff{name}{action}
-#alias autobuff {
-  #var autobuffs[%1] {%2};
-}
-#alias custombuff {
-  #var custombuffs[%1] {%2};
-}
-#nop >>
-#nop << stopbuff{name} -- removes buff from auto-rebuff table 
-#alias stopbuff {
-  #unvar autobuffs[%1];
-  showstatus;
-}
-#nop >>
-#nop << tossbuff{name} -- removes buff from all tables
-#alias tossbuff {
-  #unvar autobuffs[%1];
-  #unvar dispbuffs[%1];
-  #unvar activebuffs[%1];
-  #unvar custombuffs[%1];
-  #unvar queuedbuffs[%1];
-  showstatus;
-}
-#nop >>
 #nop << buffon/buffoff {buffname} - make buff active/inactive;
 #alias buffon {
   #if {"%1" == ""} {
@@ -213,18 +200,33 @@
     buffoff {%1};
   };
 };
-#alias ambunbuffif {
-  #high {^%3} {<bda>};
-  #nop create action to detect buff went on;
-  #act {^%3} {
-    buffoff {%1};
-    buffoff {%2};
-    #echo {> ambuffoff warning: can't know which of '%1' or '%2' buff went off <};
-  };
-};
 #nop >>;
+#nop << tossbuff{name} -- removes buff from all tables
+#alias tossbuff {
+  #unvar autobuffs[%1];
+  #unvar dispbuffs[%1];
+  #unvar activebuffs[%1];
+  #unvar custombuffs[%1];
+  #unvar queuedbuffs[%1];
+  showstatus;
+}
+#nop >>
 
+#nop << autobuff{name}{minmana}, custombuff{name}{action}
+#alias autobuff {
+  #var autobuffs[%1] {%2};
+}
+#alias custombuff {
+  #var custombuffs[%1] {%2};
+}
+#nop >>
+#nop << stopbuff{name} -- removes buff from auto-rebuff table 
+#alias stopbuff {
+  #unvar autobuffs[%1];
+  showstatus;
+}
+#nop >>
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-05-05
+#nop modif  date: 2016-05-28
