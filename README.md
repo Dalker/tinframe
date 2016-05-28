@@ -11,33 +11,17 @@
 
 * login with **[F9]**, reload scripts with **[F12]**
 
-* the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than *"$user;$pass"*. Logging in with the 'loginas' alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis.
+* read TinFrame help within TinTin++ with **tfhelp** alias
 
-* the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities:
-  * **newmap**  *\<map\>*                      : create a new map and enter it
-  * **loadmap** *\<map\> [room]*             : enter pre-existing map at some room (default: room 1)
-  * **maptransition** *\<dir\> \<map\> [room]* : make moving to the room in *\<dir\>* direction actually switch to other map
-  * **mapsymbol** *\<1 or 3 chars\>*           : adds a label to current room (or *clear* to clear)
-  * **mapname** *\<name\>*                     : gives a name to current room (or *clear* to clear)
-  * **mapexit** *\<dir\>* hide                 : hides/unhides map in the provided direction
-  * **mapexit** *\<dir\>* void                 : makes room in provided direction void (or back to normal)
-  * **mapexit** *\<dir\> \<action\>*             : really does *\<action\>* when moving into provided direction
+* the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than *"$user;$pass"*. Logging in with the **loginas** alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis: **sessionhelp** for details
 
-  and also:
-  * **savemap**   : saves current map file (done automatically when loading other map or quitting)
-  * **closemap**  : manually closes current map (rarely useful)
-  * **tossmap**   : leaves current map without saving (to discard changes since last save)
-  * **redrawmap** : does what it says, if ever needed
+* the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities: **maphelp** for details
 
-  paths can be made and followed with:
-  * **goto** *\<room\>*   : creates tintin path to room
-  * **[numpad-*]**        : moves by one room in the path
+* a status pane can be used to display flags, properties and buff status: **statushelp** for details
 
-  Finally, if keypad is used for motion (without numlock), then the numpad '**/**' key switches between two modes: moving for real (on mud) or moving on map (meaning on map only, not fo real). This is useful when adding map symbols and names, connecting rooms 'by hand', inserting void rooms, etc...
+* various information is logged, some automatically, some manually: **loghelp** for details
 
-* a status pane can be used to display flags, properties and buff status - see statuslib.tt for details
-
-* Easiest way to install and try it:
+* Easiest way to install and try TinFrame:
   1.  cd on a console to some convenient place for installation and
 
       > git clone https://github.com/dalker/tinframe
