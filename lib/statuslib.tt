@@ -36,25 +36,25 @@
   #nop then display the status flags line;
   #var flagline {$flcol};
   #foreach {$statusflags[]} {flag} {
-    #format flagline {%s%u } {$flagline} {$flag};
+    #format flagline {%s%u$recol } {$flagline} {$flag};
   };
-  statlog {$flagline$recol}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  statlog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
   #nop then display the properties line;
   #var propline {};
   #foreach {$statusprops[]} {prop} {
-    #format propline {%s%s  } {$propline} {$keycol$prop: $valcol$statusprops[$prop]};
+    #format propline {%s%s$recol  } {$propline} {$keycol$prop: $valcol$statusprops[$prop]};
   };
-  statlog {$propline$recol};
+  statlog {$propline};
   #nop finally display the buffs;
   #unvar temp;
   #foreach {$dispbuffs[]} {buff} {
     #if {&activebuffs[$buff]} {
-      #var nextbuff {$oncol$buff};
+      #var nextbuff {$oncol$buff$recol };
     }{
-      #var nextbuff {$offcol$buff};
+      #var nextbuff {$offcol$buff$recol };
     };
     #if {&tempc} {
-      statlog {$templ$tempc$nextbuff$recol};
+      statlog {$templ$tempc$nextbuff};
       #unvar tempc;
       #unvar templ;
     }; 
@@ -67,14 +67,15 @@
   };
   #if &templ {
     #if &tempc {
-      statlog {$templ$tempc$recol};
+      statlog {$templ$tempc$recol };
     } {
-      statlog {$templ$recol};
+      statlog {$templ$recol };
     };
     #unvar tempc;
     #unvar templ;
   };
-  statlog { };
+#nop   statlog {$recol };
+  #showme { };
 };
 #nop >>;
 
