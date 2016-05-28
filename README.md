@@ -4,6 +4,8 @@
 
 * rationale: this framework provides a simple, stable environment for the "mud-hopper" who likes to "hop" from mud to mud, visiting various worlds. Each mud has its configuration stored in its own directory, where one can easily import pre-existing mud-specific scripts or create new ones.
 
+![screenshot](screenshot.png?raw=true "Screenshot of TinFrame")
+
 * Easiest way to install and try TinFrame:
   1.  cd on a console to some convenient place for installation and
 
