@@ -1,0 +1,114 @@
+#nop --------------------------------------------------------------------
+#nop TinFrame standard logs: 'loglog', 'chatlog', 'statlog' and 'maplog';
+#nop --------------------------------------------------------------------
+#nop << help alias regarding logs: loghelp;
+#alias loghelp {
+    #echo {--- TinFrame logs help --- };
+    #echo {The secondary panes show the contents of pure text 'log files'};
+    #echo {A line can be added to any of those 'logs' with <log>log, };
+    #echo {and the default filename overridden with #var <log>logfile <filename>};
+    #echo {where <log> is one of: log, chat, stat, map};
+    #echo { };
+    #echo {Also, color codes are provided for these logs, which should be};
+    #echo {correctly interpreted within the secondary tmux pane consoles:};
+    #echo { \$cblack   
+            \$cred     
+            \$cgreen     
+            \$cyellow  
+            \$cblue    
+            \$cmagenta };
+    #echo { \$ccyan    
+            \$cwhite   
+            \$cgray      
+            \$clred    
+            \$clgreen  
+            \$clyellow };
+    #echo { \$clblue   
+            \$clmagenta
+            \$clcyan     
+            \$clwhite  };
+    #echo { };
+    #echo {The 'log [on|off]' command can start/stop logging everything into a dated log file};
+    #echo {and 'log <fname>' starts logging everything into an arbitrarily named log file (stop with 'log off')};
+}
+#nop >>;
+#nop << console colors, for use with standard logs;
+#var cblack   {[38;5;0m};
+#var cred     {[38;5;1m};
+#var cgreen   {[38;5;2m};
+#var cyellow  {[38;5;3m};
+#var cblue    {[38;5;4m};
+#var cmagenta {[38;5;5m};
+#var ccyan    {[38;5;6m};
+#var cwhite   {[38;5;7m};
+#var cgray    {[38;5;8m};
+#var clred    {[38;5;9m};
+#var clgreen  {[38;5;10m};
+#var clyellow {[38;5;11m};
+#var clblue   {[38;5;12m};
+#var clmagenta {[38;5;13m};
+#var clcyan   {[38;5;14m};
+#var clwhite  {[38;5;15m};
+#nop >>
+
+#var loglogfile {logs/log.txt};
+#alias loglog {
+  #line log $loglogfile %0;
+};
+
+#var chatfile {logs/chat.txt};
+#alias chatlog {
+  #line log $chatfile %0;
+};
+
+#var statfile {status.txt};
+#alias statlog {
+  #line log $statfile %0 ;
+};
+
+#alias maplog {
+  #line log map.txt %0;
+};
+
+#nop Based on a TinTin++ website example: 'log [on|off|filename]' to log all into dated file - modified to allow choice of named file instead
+#nop << log [on|off|filename];
+#alias {log} {
+  #if {"%0" == "on"} {
+    #if {"$logging" != "on"} {
+      #format {logfile} {logs/%t.html} {%Y-%m-%d};
+      #log append $logfile;
+      #var logging on
+    };
+    #else {
+      #showme You are already logging.
+    };
+  };
+  #elseif {"%0" == "off"} {
+    #if {"$logging" == "on"} {
+      #log off;
+      #var logging off
+    };
+    #else {
+      #showme You are not logging.
+    };
+  };
+  #elseif {"%0" != ""} {
+    #if {"$logging" != "on"} {
+      #format {logfile} {logs/%t.html} {%0};
+      #log append $logfile;
+      #var logging on
+    };
+    #else {
+      #showme You are already logging.
+    };
+  };
+  #else {
+    #showme Turn logging on or off?
+  };
+}
+#nop >>
+
+#nop------------------------
+#nop CopyLeft by dalker
+#nop create date: 2016-05-28
+#nop modif  date: 2016-05-28
