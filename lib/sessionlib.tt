@@ -20,6 +20,9 @@
     #echo {E = empty by default , others may be overridden if needed on a per-mud basis};
 }
 #nop >>;
+#nop - alias 'loginas' to login using a character defined on a chars/ .tt file and recall information about it
+#nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
+#nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
 #nop << auto-set $activesession, auto-save map, log connection/disconnection and call 'onconnect', 'onquit', ...;
 #alias fetchdate {#script thedate {date +"%Y.%m.%d - %H:%M"}}
 #event {SESSION CONNECTED}{
@@ -197,7 +200,6 @@
   };
 };
 #nop >>
-
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28

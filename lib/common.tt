@@ -40,9 +40,11 @@
   #if { "%1" == "" } {
     #echo {--- TinFrame help --- };
     #echo {topics available: (tfhelp <topic> or <topic>help) };
+    #echo {* key     * keybindings from TinFrame};
     #echo {* session * login / quit handling };
     #echo {* log     * log files in TinFrame};
-    #echo {* key     * keybindings from TinFrame};
+    #echo {* status  * status pane handling};
+    #echo {* map     * map handling};
   };
   #else {
     %1help;

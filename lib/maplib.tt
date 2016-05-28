@@ -1,6 +1,11 @@
 #nop -----------------------------------------
 #nop  Standard map handling (mud independent)
 #nop -----------------------------------------
+#alias maphelp { #nop << help alias;
+    #echo {--- TinFrame map handling --- };
+    #echo { };
+};
+#nop >>;
 #nop $currentmap will hold the current map name
 #nop aliases 'newmap', 'loadmap', 'savemap', 'closemap' (also saves), 'tossmap' (doesn't save), redrawmap
 #nop alias 'maptransition' to switch between maps

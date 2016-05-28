@@ -1,6 +1,11 @@
 #nop .-----------------.
 #nop |   status log    |
 #nop .-----------------.
+#alias statushelp { #nop << help alias;
+    #echo {--- TinFrame status pane handling --- };
+    #echo { };
+};
+#nop >>;
 
 #nop associative tables: statusflags, dispbuffs, activebuffs, autobuffs, queuedbuffs, custombuffs;
 #nop << make sure the hashes exist - but make sure they don't get killed when reloading class;
