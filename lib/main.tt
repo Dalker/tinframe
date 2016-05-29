@@ -1,8 +1,8 @@
 #nop ----------------------------------------- 
 #nop  Common tintin scripts (mud independent)
 #nop -----------------------------------------
-#class lib kill
-#class lib open
+#class mainlib kill
+#class mainlib open
 
 #nop -----------------------------------------
 #nop tinframe help
@@ -63,9 +63,9 @@
 };
 #nop >>;
 
-#nop -----------------------------------------
+#nop -------------------------------------------------------
 #nop aspects of tinframe not worthy of a separate class file
-#nop -----------------------------------------
+#nop -------------------------------------------------------
 #nop << base config: color patch, unicode
 #config {color patch} {on};
 
@@ -123,11 +123,11 @@
 #alias libinclude       {#class %1 kill; #class %1 read $libdir/%1.tt};
 #nop >>
 #nop << include library classes
-libinclude sessionlib;
 libinclude loglib;
-libinclude statuslib;
 libinclude maplib;
-#echo {classes lib, stdlib, maplib and statuslib (re)loaded};
+libinclude sessionlib;
+libinclude statuslib;
+#echo {included tinframe classes: loglib maplib sessionlib statuslib};
 #nop >>
 #nop << (re)load local include classes as well as char and map classes, if any;
 #script {localincludes} {cd include; ls *.tt | sed -e "s/.tt$//"};
@@ -136,7 +136,7 @@ libinclude maplib;
   classinclude $localincludes[$index];
   #var included {$included $localincludes[$index]};
 };
-#echo {included local classes: $included};
+#echo {included local classes:$included};
 #unvar localincludes;
 #unvar index;
 #unvar included;
@@ -158,10 +158,13 @@ libinclude maplib;
     #echo {current map doesn't have an associated class};
   };
   #unvar temp;
+} {
+  #echo {not on a map};
 };
 #nop >>
 
+#echo {TinFrame main lib (re)loaded};
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-05-28
+#nop modif  date: 2016-05-29

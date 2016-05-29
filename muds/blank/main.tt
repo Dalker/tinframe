@@ -13,10 +13,10 @@
 
 #nop include the TinFrame library after defining the mud
 #read {$tinframe}
-#class main open
 
-#nop mud-specific scripting starts here:
-#nop (whatever comes next overrides the library, includes and char's definitions)
+#class main open
+#nop finish mud-specific configuration 
+#nop N.B.: whatever comes next overrides the library, includes and char's definitions
 #nop << login handling
 #nop login request detection
 #act {^By which name would you like to be known?} {
@@ -35,7 +35,6 @@
 }
 #nop >>
 
-
-#nop------------------------
-#echo {class main (re)loaded}
+#nop-------------------------------------
+#echo {$mudname configuration (re)loaded}
 #class temp open
