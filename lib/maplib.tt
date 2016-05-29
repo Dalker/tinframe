@@ -28,7 +28,7 @@
 
 #nop << auxiliary functions: 'redrawmap', 'savemap', 'setmap name', 'unsetmap';
 
-#alias redrawmap {#MAP {map} {59x22} {map.txt}};
+#alias redrawmap {#MAP {map} {59x22} {$maplogfile}};
 
 #alias setmap {
   #variable currentmap %1;
@@ -56,7 +56,7 @@
 #nop >>
 #nop << 'closemap', also called by newmap and loadmap;
 #alias closemap {
-  #class temp write map.txt;
+  #class temp write $maplogfile;
   #if &mapfile {
     #echo {leaving $currentmap map safely.};
     savemap;
@@ -70,7 +70,7 @@
 #nop >>
 #nop << destroy map without saving: 'tossmap';
 #alias tossmap {
-  #class temp write map.txt;
+  #class temp write $maplogfile;
   #if &mapfile {
     #echo {tossing $currentmap map without saving.};
     #map destroy;
@@ -305,4 +305,4 @@ moveforreal
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-05-28
+#nop modif  date: 2016-05-29
