@@ -27,23 +27,23 @@ This project is a framework for using the [TinTin++](http://tintin.sourceforge.n
 
       > cd testmud
 
-  3. edit the three mandatory lines on the main.tt file that define the mud's name, address and port
+  3. edit the three mandatory lines on the **main.tt** file that define the mud's name, address and port
   4. rename and edit the chars/samplechar.tt file to define a character for that mud
   5. cd back to the main installation directory and run from a console
 
      > ./tinframe testmud
-  6. read TinFrame help within TinTin++ with the **tfhelp** alias
+  6. read TinFrame help within TinTin++ with the `tfhelp` alias
   7. login with **[F9]**
 
 ### Some extra details
 
-* session handling works best if a small character file is written based on a provided template. The minimum it must contain is a definition of the variable `$user` and `$pass` for that character, and possibly some minor adaptations of the mud's `main.tt` regarding the login sequence expected by the mud. The character's status and map location will be automatically saved between sessions. Type **sessionhelp** within a TinFrame session ofTinTin++ for more details
+* session handling works best if a small character file is written based on a provided template. The minimum it must contain is a definition of the variable `$user` and `$pass` for that character, and possibly some minor adaptations of the mud's **main.tt** regarding the login sequence expected by the mud. The character's status and map location will be automatically saved between sessions. Type `sessionhelp` within a TinFrame session ofTinTin++ for more details
 
-* the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities: **maphelp** for details
+* the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities: `maphelp` for details
 
-* a status pane can be used to display flags, properties and buff status: **statushelp** for details
+* a status pane can be used to display flags, properties and buff status: `statushelp` for details
 
-* various information is logged, some automatically, some manually: **loghelp** for details
+* various information is logged, some automatically, some manually: `loghelp` for details
 
 * alternate layouts are provided, called by the shell scripts *tinframe* and *tinframe2*:
   * **tinframe** is meant for wider screens. In its main window the main pane receives mud output, with two lines reserved at the bottom for prompt information. On top of that a few lines with the same width are meant to receive copies of any chat lines (chat detection script to be configured per-mud based on a template). To the right, a fixed-width pane shows an automatic map (started with the **newmap** alias), some logged information (connection/diconnection times, plus other information to be configured per-mud based on a template), and a third optional 'status' zone which may be configured mud-wise, e.g. to display buff status. A second tmux window is present in the background providing easy access to a terminal in the right directory for mud-specific scripting and/or note-taking (how to access it depends on local tmux keyboard configuration).
