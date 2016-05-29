@@ -14,11 +14,15 @@
     #echo {buffif <buff> <trigger> : buffon  on ^trigger mud line};
     #echo {unbuffif <buff> <trig>  : buffoff on ^trig    mud line};
     #echo {tossbuff <buff>         : remove buff from all lists};
+    #echo {@flag[on|off] <flag>    : booleans for use in conditionals};
+    #echo {@buff[on|off] <buff>    : booleans for use in conditionals};
     #echo {autobuff/custombuff/stopbuff - partially implemented for bot-allowing muds};
 };
 #nop >>;
 
-#nop associative tables: statusflags, dispbuffs, activebuffs, autobuffs, queuedbuffs, custombuffs;
+#nop associative tables: statusflags, dispbuffs, activebuffs, autobuffs, queuedbuffs, custombuffs, statusprops;
+#nop N.B.: queuedbuffs is purely a placeholder, not implemented on framework 
+#nop       (can be used on a per-mud basis combined with autobuff/custombuff/stopbuff)
 #nop << make sure the hashes exist - but make sure they don't get killed when reloading class;
 #nop these lists must live in 'temp', so that they don't get erased when reloading the libs;
 #class temp open;
@@ -212,6 +216,39 @@
 }
 #nop >>
 
+#nop booleans provided for use in conditionals
+#nop << @flagon{flag} @flagoff{flag} @buffon{buff} @buffoff{buff}
+#function flagon {
+    #if { "$statusflags[%1]" == "on" } {
+      #return 1; #nop true;
+    } {
+      #return 0; #nop false;
+    };
+}
+#function flagoff {
+    #if { "$statusflags[%1]" == "on" } {
+      #return 0; #nop false;
+    } {
+      #return 1; #nop true;
+    };
+}
+#function buffon {
+    #if { "$activebuffs[%1]" == "on" } {
+      #return 1; #nop true;
+    } {
+      #return 0; #nop false;
+    };
+}
+#function buffoff {
+    #if { "$activebuffs[%1]" == "on" } {
+      #return 0; #nop false;
+    } {
+      #return 1; #nop true;
+    };
+}
+#nop >>
+
+#nop modification of autobuff/custombuff (actual use to be implemented in mud)
 #nop << autobuff{name}{minmana}, custombuff{name}{action}
 #alias autobuff {
   #var autobuffs[%1] {%2};
