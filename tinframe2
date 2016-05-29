@@ -1,10 +1,11 @@
 #!/bin/zsh
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
+TFMAIN=$TFLIBDIR/common.tt
 LOGFILE="logs/log.txt"
 CHATFILE="logs/chat.txt"
-MAPFILE="map.txt"
-STATFILE="status.txt"
+MAPFILE="logs/map.txt"
+STATFILE="logs/status.txt"
 MAINTT="main.tt"
 
 if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
@@ -70,4 +71,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2015-07-26
-# modif  date: 2016-04-30
+# modif  date: 2016-05-29

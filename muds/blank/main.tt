@@ -11,11 +11,9 @@
 #var mudhost mud.goodmud.org 
 #var mudport 1111
 
-#nop << include the TinFrame library ---------
-#read {$libdir/common.tt}
-#nop >>
-#nop -----------------------------------------
-#class main open
+#nop include the TinFrame library after defining the mud
+#read {$tinframe}
+#nop then add extra scripting
 
 #nop optional mud-specific config below:
 #nop << login handling
