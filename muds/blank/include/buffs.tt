@@ -1,0 +1,39 @@
+#nop THIS IS A TEMPLATE
+
+#nop -------------------------------------
+#nop buffs detection (mud specific syntax)
+#nop -------------------------------------
+
+buffif   fly {Your feet rise off the ground.}
+buffif   fly {You are already airborne.}
+unbuffif fly {You slowly float to the ground.}
+
+buffif   armor {You feel someone protecting you.}
+buffif   armor {You are already armored.}
+unbuffif armor {You feel less armored.}
+
+buffif   shield {You are surrounded by a force shield.}
+buffif   shield {You are already shielded from harm.}
+unbuffif shield {Your force shield shimmers then fades away.}
+
+#nop detect invis and detect magic can yield the same message
+#nop -> disambiguate via aliases (if cast success detected, know from which spell it was)
+#alias di {
+  buffif   {detect inv} {Your eyes tingle.};
+  #send {cast 'detect invis'};
+}
+
+#alias dm {
+  buffif   {detect mag} {Your eyes tingle.};
+  #send {cast 'detect magic'};
+}
+
+buffif   {detect inv} {You can already see invisible.}
+unbuffif {detect inv} {You no longer see invisible objects.}
+
+buffif   {detect mag} {You can already sense magical auras.}
+unbuffif {detect mag} {The detect magic wears off.}
+
+buffif   {detect hidden} {Your awareness improves.}
+buffif   {detect hidden} {You are already as alert as you can be.}
+unbuffif {detect hidden} {You feel less aware of your surroundings.}
