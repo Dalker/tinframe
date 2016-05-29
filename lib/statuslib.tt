@@ -14,8 +14,10 @@
     #echo {buffif <buff> <trigger> : buffon  on ^trigger mud line};
     #echo {unbuffif <buff> <trig>  : buffoff on ^trig    mud line};
     #echo {tossbuff <buff>         : remove buff from all lists};
-    #echo {@flag[on|off] <flag>    : booleans for use in conditionals};
-    #echo {@buff[on|off] <buff>    : booleans for use in conditionals};
+    #echo {@flag[on|off] {<flag>}  : booleans for use in conditionals};
+    #echo {@buff[on|off] {<buff>}  : booleans for use in conditionals};
+    #echo {foreachbuff {<action>}  : perform action on %%%1, replaced by each buff};
+    #echo {foreachflag {<action>}  : perform action on %%%1, replaced by each flag};
     #echo {autobuff/custombuff/stopbuff - partially implemented for bot-allowing muds};
 };
 #nop >>;
@@ -245,6 +247,23 @@
     } {
       #return 1; #nop true;
     };
+}
+#nop >>
+
+#nop loop on buffs / flags
+#nop << foreachbuff {action on %1}, foreachflag {action on %1}
+#alias foreachbuff {
+  #alias oneachbuff {%1};
+  #foreach {$dispbuffs[]} {buff} {oneachbuff {$buff}};
+  #unvar buff;
+  #unvar oneachbuff;
+}
+
+#alias foreachflag {
+  #alias oneachflag {%1};
+  #foreach {$statusflags[]} {flag} {oneachflag {$flag}};
+  #unvar flag;
+  #unvar oneachflag;
 }
 #nop >>
 
