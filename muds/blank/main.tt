@@ -11,19 +11,8 @@
 #var mudhost mud.goodmud.org 
 #var mudport 1111
 
-#nop << includes -----------------------------------------
+#nop << include the TinFrame library ---------
 #read {$libdir/common.tt}
-#alias charinclude { 
-  #if { &charfile } { 
-    classincludefrom $charfile;
-  }; 
-  #else { #echo {no char defined yet}; };
-}
-classinclude map
-classinclude chat
-classinclude prompt
-#echo {classes map, chat, prompt included}
-charinclude
 #nop >>
 #nop -----------------------------------------
 #class main open
