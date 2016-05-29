@@ -35,10 +35,8 @@ else
     cd $TFMUDSDIR/$SESSION
      
     # setup window and start tintin
-#     tmux new-window    -t $SESSION:1 -k -n "tintin" "tintin -G -t main $MAINTT; tmux kill-session -t $SESSION"
-#     above line ceased to work for some reason; replaced with following hack
     tmux new-window    -t $SESSION:1 -k -n "tintin" "zsh"
-    tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -t main $MAINTT && tmux kill-session" Enter
+    tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
     tmux new-window    -t $SESSION:2 -k -n "vim"
     tmux select-window -t $SESSION:1
     
