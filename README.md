@@ -6,8 +6,9 @@ This project is a framework for using the [TinTin++](http://tintin.sourceforge.n
 
 * rationale: this framework provides a simple, stable environment for the "mud-hopper" who likes to "hop" from mud to mud, visiting various worlds. Each mud has its configuration stored in its own directory, where one can easily import pre-existing mud-specific scripts or create new ones.
 
-* requirements: [TinTin++](http://tintin.sourceforge.net/), [tmux](https://tmux.github.io/) and [zsh](http://zsh.sourceforge.net/)
+* requirements: [TinTin++](http://tintin.sourceforge.net/), [tmux](https://tmux.github.io/) 
 
+* used by default: [zsh](http://zsh.sourceforge.net/) - 
   `zsh` can probably be replaced by `bash` or some other shell - this requires editing the [shebangs](https://en.wikipedia.org/wiki/Shebang_%28Unix%29#Examples) and direct calls to zsh in the **tinframe** and **tinframe2** shell scripts
 
 * Here's what it can look like:
