@@ -7,13 +7,16 @@
 #class main open
 
 #nop mandatory mud-specific configuration in next 3 lines:
+#nop (this must be done before calling the library)
 #var mudname {GoodMud}
 #var mudhost mud.goodmud.org 
 #var mudport 1111
 
 #nop include the TinFrame library after defining the mud
 #read {$tinframe}
-#nop then add extra scripting
+
+#nop mud-specific scripting starts here:
+#nop (whatever comes next overrides the library, includes and char's definitions)
 
 #nop optional mud-specific config below:
 #nop << login handling
@@ -29,31 +32,11 @@
 #nop << logout handling
 #alias postquit {
   #nop extra bits of quit handling after map is closed;
-  #nop by default this acts both after quit and timeout
+  #nop by default this acts after either quit or timeout
   memalso {#nop extra stuff};
 }
 #nop >>
 
-#nop mud-specific scripting starts here:
-#nop << bags handling
-#nop char needs to setup vars with bag names
-#nop main bag handling (mud specific syntax)
-#alias mbl {look in $mainbag};
-#alias mbg {get %0 $mainbag};
-#alias mbp {put %0 $mainbag};
-#alias mbo {open $mainbag};
-#alias mbc {close $mainbag};
-#alias tbl {look in $toolbag};
-#alias tbg {get %0 $toolbag};
-#alias tbp {put %0 $toolbag};
-#alias tbo {open $toolbag};
-#alias tbc {close $toolbag};
-#alias lbl {look in $lootbag};
-#alias lbg {get %0 $lootbag};
-#alias lbp {put %0 $lootbag};
-#alias lbo {open $lootbag};
-#alias lbc {close $lootbag};
-#nop >>
 
 #nop------------------------
 #echo {class main (re)loaded}

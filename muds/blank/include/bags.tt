@@ -1,0 +1,28 @@
+#nop THIS IS A TEMPLATE
+
+#nop -----------------------------------
+#nop bags handling (mud specific syntax)
+#nop -----------------------------------
+
+#nop N.B.: char needs to setup vars with bag names
+
+#nop main bag handling 
+#alias mbl {look in $mainbag};
+#alias mbg {get %0 $mainbag};
+#alias mbp {put %0 $mainbag};
+#alias mbo {open $mainbag};
+#alias mbc {close $mainbag};
+
+#nop tool bag handling
+#alias tbl {look in $toolbag};
+#alias tbg {get %0 $toolbag};
+#alias tbp {put %0 $toolbag};
+#alias tbo {open $toolbag};
+#alias tbc {close $toolbag};
+
+#nop loot bag handling
+#alias lbl {look in $lootbag};
+#alias lbg {get %0 $lootbag};
+#alias lbp {put %0 $lootbag};
+#alias lbo {open $lootbag};
+#alias lbc {close $lootbag};
