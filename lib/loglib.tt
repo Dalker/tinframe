@@ -56,18 +56,19 @@
   #line log $loglogfile %0;
 };
 
-#var chatfile {logs/chat.txt};
+#var chatlogfile {logs/chat.txt};
 #alias chatlog {
-  #line log $chatfile %0;
+  #line log $chatlogfile %0;
 };
 
-#var statfile {status.txt};
-#alias statlog {
-  #line log $statfile %0 ;
+#var statuslogfile {logs/status.txt};
+#alias statuslog {
+  #line log $statuslogfile %0 ;
 };
 
+#var maplogfile {logs/map.txt};
 #alias maplog {
-  #line log map.txt %0;
+  #line log $maplogfile %0 ;
 };
 
 #nop Based on a TinTin++ website example: 'log [on|off|filename]' to log all into dated file - modified to allow choice of named file instead
@@ -111,4 +112,4 @@
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-05-28
+#nop modif  date: 2016-05-29

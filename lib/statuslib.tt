@@ -47,20 +47,20 @@
   #var thecount 0;
   #while { $thecount < 7 } {
     #math thecount { $thecount + 1};
-    statlog { };
+    statuslog { };
   };
   #nop then display the status flags line;
   #var flagline {$flcol};
   #foreach {$statusflags[]} {flag} {
     #format flagline {%s%u$recol } {$flagline} {$flag};
   };
-  statlog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  statuslog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
   #nop then display the properties line;
   #var propline {};
   #foreach {$statusprops[]} {prop} {
     #format propline {%s%s$recol  } {$propline} {$keycol$prop: $valcol$statusprops[$prop]};
   };
-  statlog {$propline};
+  statuslog {$propline};
   #nop finally display the buffs;
   #unvar temp;
   #foreach {$dispbuffs[]} {buff} {
@@ -70,7 +70,7 @@
       #var nextbuff {$offcol$buff$recol };
     };
     #if {&tempc} {
-      statlog {$templ$tempc$nextbuff};
+      statuslog {$templ$tempc$nextbuff};
       #unvar tempc;
       #unvar templ;
     }; 
@@ -83,14 +83,14 @@
   };
   #if &templ {
     #if &tempc {
-      statlog {$templ$tempc$recol };
+      statuslog {$templ$tempc$recol };
     } {
-      statlog {$templ$recol };
+      statuslog {$templ$recol };
     };
     #unvar tempc;
     #unvar templ;
   };
-#nop   statlog {$recol };
+#nop   statuslog {$recol };
   #showme { };
 };
 #nop >>;
@@ -229,4 +229,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-05-28
+#nop modif  date: 2016-05-29
