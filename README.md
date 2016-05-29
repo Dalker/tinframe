@@ -1,8 +1,8 @@
-# TinFrame - a framework for TinTin++ using tmux
+## TinFrame - a framework for TinTin++ using tmux
 
-## What is TinFrame?
+### What is TinFrame?
 
-* This project is a framework for using the [TinTin++](http://tintin.sourceforge.net/) mud client using the [tmux](https://tmux.github.io/) terminal multiplexer
+This project is a framework for using the [TinTin++](http://tintin.sourceforge.net/) mud client using the [tmux](https://tmux.github.io/) terminal multiplexer
 
 * rationale: this framework provides a simple, stable environment for the "mud-hopper" who likes to "hop" from mud to mud, visiting various worlds. Each mud has its configuration stored in its own directory, where one can easily import pre-existing mud-specific scripts or create new ones.
 
@@ -10,10 +10,11 @@
 
   `zsh` can probably be replaced by `bash` or some other shell - this requires editing the [shebangs](https://en.wikipedia.org/wiki/Shebang_%28Unix%29#Examples) and direct calls to zsh in the **tinframe** and **tinframe2** shell scripts
 
+* Here's what it can look like:
 
 ![screenshot](screenshot.png?raw=true "Screenshot of TinFrame")
 
-## Easiest way to install and try TinFrame:
+### Easiest way to install and try TinFrame:
   1.  cd on a console to some convenient place for installation and
 
       > git clone https://github.com/dalker/tinframe
@@ -33,9 +34,9 @@
   6. read TinFrame help within TinTin++ with the **tfhelp** alias
   7. login with **[F9]**
 
-## Some extra details
+### Some extra details
 
-* the character handler requires writing a small character file based on a template and specifying what the mud's log in screen expect if its anything else than *"$user;$pass"*. Logging in with the **loginas** alias will then ensure that the character's position on the map will be memorized between sessions, as well as any other information that can be optionally configured on a per-mud basis: **sessionhelp** for details
+* session handling works best if a small character file is written based on a provided template. The minimum it must contain is a definition of the variable `$user` and `$pass` for that character, and possibly some minor adaptations of the mud's `main.tt` regarding the login sequence expected by the mud. The character's status and map location will be automatically saved between sessions. Type **sessionhelp** within a TinFrame session ofTinTin++ for more details
 
 * the auto-mapper provides several aliases to help use TinTin++'s mapping capabilities: **maphelp** for details
 
