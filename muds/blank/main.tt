@@ -3,7 +3,6 @@
 #nop - this file's dir has subdirs named include/, map/, chars/ and log/
 #nop - variables $mudname $mudhost and $mudport are defined below
 #nop - class 'temp' opened at the end of this file
-
 #class main open
 
 #nop mandatory mud-specific configuration in next 3 lines:
@@ -14,11 +13,10 @@
 
 #nop include the TinFrame library after defining the mud
 #read {$tinframe}
+#class main open
 
 #nop mud-specific scripting starts here:
 #nop (whatever comes next overrides the library, includes and char's definitions)
-
-#nop optional mud-specific config below:
 #nop << login handling
 #nop login request detection
 #act {^By which name would you like to be known?} {
