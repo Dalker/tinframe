@@ -10,7 +10,9 @@
     #echo {newmap <name>           : create new map};
     #echo {loadmap <name> [room]   : load existing map, with optional room (else room 1)};
     #echo {maptransition};
-    #echo {     <dir> <map> [room] : create transition to other map <map> in direction <dir>};
+    #echo {     <dir> <map> [act]  : create transition to other map <map> in direction <dir>};
+    #echo {                          [act] is an optional action to use instead of <dir> (e.g. {climb rope})};
+    #echo {newmaptransition ...    : as maptransition, but also create new map and relevant rooms};
     #echo {goto <room>             : set path to <room>};
     #echo {<Num*>                  : walk on path set by 'goto'};
     #echo {mapsymbol <symbol>      : set room symbol, or clear it if <symbol>=clear};
@@ -23,7 +25,7 @@
 #nop >>;
 #nop $currentmap will hold the current map name
 #nop aliases 'newmap', 'loadmap', 'savemap', 'closemap' (also saves), 'tossmap' (doesn't save), redrawmap
-#nop alias 'maptransition' to switch between maps
+#nop aliases 'maptransition' and 'newmaptransition' to switch between maps
 #nop also 'moveonmap' and its counterpart 'moveforreal'
 
 #nop << auxiliary functions: 'redrawmap', 'savemap', 'setmap name', 'unsetmap';
@@ -160,6 +162,54 @@
     mapexit %1 {#delay .1 {loadmap %2}; #send {%1}; #echo {loading map... wait a tiny bit!}};
   } {
     mapexit %1 {#delay .1 {loadmap %2}; #send {%3}; #echo {loading map... wait a tiny bit!}};
+  };
+}
+#nop >>
+#nop << 'newmaptransition dir newmapname';
+#nop    notice: the direction has to point to an existing room that will never be actually reached, but
+#nop            which typically has a mapsymbol pointing to the destination
+#alias newmaptransition {
+  #var srcdir %1;
+  #var srcmap $currentmap;
+  #var dstmap %2;
+  #format abdst {%.3s} $dstmap;
+  #format abdst {%n} $abdst;
+  #if { "%3" == "" } { 
+    #var srccmd $srcdir;
+  } {
+    #var srccmd %3;
+  };
+  #switch {"$srcdir"} {
+    #case {"n"} {#var dstdir s};
+    #case {"s"} {#var dstdir n};
+    #case {"e"} {#var dstdir w};
+    #case {"w"} {#var dstdir e};
+    #case {"u"} {#var dstdir d};
+    #case {"d"} {#var dstdir u};
+  };
+  #if { "%4" == "" } { 
+    #var dstcmd $dstdir;
+  } {
+    #var dstcmd %4;
+  };
+
+  #format tmp {maps/%s.map} {$dstmap};
+  #script {temp} {ls $tmp};
+  #if {"$temp[1]" != ""} {
+    #echo {newmaptransition: map $dstmap exists - aborting};
+  } {
+    mapname {from$dstmap};
+    #map move $srcdir;
+    mapsymbol $abdst;
+    mapname $dstmap;
+    newmap $dstmap;
+    #map move $dstdir;
+    mapsymbol {...};
+    mapname $srcmap;
+    #map move $srcdir;
+    mapexit $dstdir {#delay .1 {loadmap $srcmap from$dstmap}; #send {$dstcmd}; #echo {loading map... wait a tiny bit!}};
+    loadmap $srcmap from$dstmap;
+    mapexit $srcdir {#delay .1 {loadmap $dstmap}; #send {$srccmd}; #echo {loading map... wait a tiny bit!}};
   };
 }
 #nop >>
@@ -305,4 +355,4 @@ moveforreal
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-05-29
+#nop modif  date: 2016-05-30
