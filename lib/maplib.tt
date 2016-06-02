@@ -12,7 +12,7 @@
     #echo {maptransition};
     #echo {     <dir> <map> [act]  : create transition to other map <map> in direction <dir>};
     #echo {                          [act] is an optional action to use instead of <dir> (e.g. {climb rope})};
-    #echo {newmaptransition ...    : as maptransition, but also create new map and relevant rooms};
+    #echo {newtransition <d><m>[a] : as maptransition, but also create new map and relevant rooms};
     #echo {goto <room>             : set path to <room>};
     #echo {<Num*>                  : walk on path set by 'goto'};
     #echo {mapsymbol <symbol>      : set room symbol, or clear it if <symbol>=clear};
@@ -25,7 +25,7 @@
 #nop >>;
 #nop $currentmap will hold the current map name
 #nop aliases 'newmap', 'loadmap', 'savemap', 'closemap' (also saves), 'tossmap' (doesn't save), redrawmap
-#nop aliases 'maptransition' and 'newmaptransition' to switch between maps
+#nop aliases 'maptransition' and 'newtransition' to switch between maps
 #nop also 'moveonmap' and its counterpart 'moveforreal'
 
 #nop << auxiliary functions: 'redrawmap', 'savemap', 'setmap name', 'unsetmap';
@@ -165,10 +165,10 @@
   };
 }
 #nop >>
-#nop << 'newmaptransition dir newmapname';
+#nop << 'newtransition dir newmapname';
 #nop    notice: the direction has to point to an existing room that will never be actually reached, but
 #nop            which typically has a mapsymbol pointing to the destination
-#alias newmaptransition {
+#alias newtransition {
   #var srcdir %1;
   #var srcmap $currentmap;
   #var dstmap %2;
@@ -196,7 +196,7 @@
   #format tmp {maps/%s.map} {$dstmap};
   #script {temp} {ls $tmp};
   #if {"$temp[1]" != ""} {
-    #echo {newmaptransition: map $dstmap exists - aborting};
+    #echo {newtransition: map $dstmap exists - aborting};
   } {
     mapname {from$dstmap};
     #map move $srcdir;
