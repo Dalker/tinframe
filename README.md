@@ -2,7 +2,7 @@
 
 ### What is TinFrame?
 
-This project is a framework for using the [TinTin++](http://tintin.sourceforge.net/) mud client using the [tmux](https://tmux.github.io/) terminal multiplexer
+This project is a framework for using the [TinTin++](http://tintin.sourceforge.net/) mud client with the [tmux](https://tmux.github.io/) terminal multiplexer
 
 * **rationale**: this framework provides a simple, stable environment for the "mud-hopper" who likes to "hop" from mud to mud, visiting various worlds. Each mud has its configuration stored in its own directory, where one can easily import pre-existing mud-specific scripts or create new ones.
 
