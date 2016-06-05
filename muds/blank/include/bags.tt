@@ -13,6 +13,13 @@
 #alias mbo {open $mainbag};
 #alias mbc {close $mainbag};
 
+#nop secondary bag handling 
+#alias sbl {look in $secondbag};
+#alias sbg {get %0 $secondbag};
+#alias sbp {put %0 $secondbag};
+#alias sbo {open $secondbag};
+#alias sbc {close $secondbag};
+
 #nop tool bag handling
 #alias tbl {look in $toolbag};
 #alias tbg {get %0 $toolbag};
