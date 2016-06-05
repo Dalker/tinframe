@@ -18,3 +18,4 @@
 #nop -----------------------------------------
 
 #act {^Alas, you cannot go that way.} {#map undo}
+#act {^The %1 is closed.} {#map undo; open %1}
