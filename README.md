@@ -8,9 +8,6 @@ This project is a framework for using the [TinTin++](http://tintin.sourceforge.n
 
 * **requirements**: [TinTin++](http://tintin.sourceforge.net/), [tmux](https://tmux.github.io/) 
 
-* **used by default**: [zsh](http://zsh.sourceforge.net/) - 
-  `zsh` can probably be replaced by `bash` or some other shell - this requires editing the [shebangs](https://en.wikipedia.org/wiki/Shebang_%28Unix%29#Examples) and direct calls to zsh in the `tinframe` and `tinframe2` shell scripts
-
 * Here's what it can look like:
 
 ![screenshot](screenshot.png?raw=true "Screenshot of TinFrame")
