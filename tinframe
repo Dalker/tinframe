@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
@@ -36,7 +36,8 @@ else
     # setup window and start tintin
 #     tmux new-window    -t $SESSION:1 -k -n "tintin" "tintin -G -t main $MAINTT; tmux kill-session -t $SESSION"
 #     above line ceased to work for some reason; replaced with following hack
-    tmux new-window    -t $SESSION:1 -k -n "tintin" "zsh"
+    # auto-detect user's actual shell and use the same in second tmux window
+    tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
     tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
     tmux new-window    -t $SESSION:2 -k -n "vim"
     tmux select-window -t $SESSION:1
@@ -64,4 +65,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2014-02-09
-# modif  date: 2016-05-29
+# modif  date: 2016-06-05

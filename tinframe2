@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
@@ -39,7 +39,8 @@ else
     # note that if one of the streams does not exist, the corresponding pane will simply auto-close :-) <-- not true with -Fs1
      
     # setup window 1
-    tmux new-window    -t $SESSION:1 -k -n "tintin" "zsh"
+    # auto-detect user's actual shell and use the same in second tmux window
+    tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
     tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
     tmux select-window -t $SESSION:1
     # split left between up 1.2 / down 1.1
@@ -70,4 +71,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2015-07-26
-# modif  date: 2016-05-29
+# modif  date: 2016-06-05
