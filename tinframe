@@ -39,7 +39,7 @@ else
     # auto-detect user's actual shell and use the same in second tmux window
     tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
     tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
-    tmux new-window    -t $SESSION:2 -k -n "vim"
+    tmux new-window    -t $SESSION:2 -k -n "$(basename $SHELL)"
     tmux select-window -t $SESSION:1
     
     # setup panes and start chat, log, map and status streams

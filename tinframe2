@@ -58,7 +58,7 @@ else
     tmux split-window -t $SESSION:2.1 -h -l 60 "tail -Fs0.5 $MAPFILE"
 
     # setup window 3
-    tmux new-window    -t $SESSION:3 -k -n "vim"
+    tmux new-window    -t $SESSION:3 -k -n "$(basename $SHELL)"
 
     # select main pane
     tmux select-window -t $SESSION:1
