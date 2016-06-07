@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
@@ -14,7 +14,6 @@ then
   echo "Usage: $(basename $0) <name>, where <name> is one of:"
   cd $TFMUDSDIR
   ls | sed -e "s/blank//" -e "s/past//" -e "s/lib//" | xargs echo
-  cd -
 else
   # name of tmux session
   export SESSION="$1"
