@@ -7,8 +7,8 @@
 
 #nop mandatory mud-specific configuration in next 3 lines:
 #nop (this must be done before calling the library)
-#var mudname {GoodMud}
-#var mudhost mud.goodmud.org 
+#var mudname MyMud
+#var mudhost mud.mymud.org 
 #var mudport 1111
 
 #nop include the TinFrame library after defining the mud
