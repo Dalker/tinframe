@@ -8,6 +8,8 @@
 #alias mr {#map return}
 #alias ms {mapsymbol %1}
 #alias mn {mapname %1}
+#alias md {redrawmap}
+#alias mx {mapexit %0}
 
 #nop -----------------------------------------
 #nop  Possible entry points to the map
