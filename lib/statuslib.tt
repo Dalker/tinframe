@@ -96,8 +96,6 @@
     #unvar tempc;
     #unvar templ;
   };
-#nop   statuslog {$recol };
-  #showme { };
 };
 #nop >>;
 
@@ -285,4 +283,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-05-29
+#nop modif  date: 2016-06-17

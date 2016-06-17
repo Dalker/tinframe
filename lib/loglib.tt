@@ -63,7 +63,7 @@
 
 #var statuslogfile {logs/status.txt};
 #alias statuslog {
-  #line log $statuslogfile %0 ;
+  #line log $statuslogfile {%1 %2 %3 %4 %5 %6};
 };
 
 #var maplogfile {logs/map.txt};
@@ -112,4 +112,4 @@
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-05-29
+#nop modif  date: 2016-06-17
