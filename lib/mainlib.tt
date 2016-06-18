@@ -144,18 +144,20 @@ libinclude statuslib;
 #nop (re)load character's class file, if any;
 #if {&char} { 
   subclassinclude {chars} {$char};
+  #echo {$char's char class (re)loaded};
 } {
   #echo {no char defined yet};
 };
 
 #nop (re)load map class file, if any;
-#if { &mclfile } {
+#if { &currentmap } {
   #script {temp} { ls $mclfile 2> /dev/null };
   #if {"$temp[1]" != ""} {
-     classincludefrom $mclfile;
+     subclassinclude {maps} {$currentmap};
+     #echo {reloaded map file for $currentmap};
   };
   #else {
-    #echo {current map doesn't have an associated class};
+    #echo {map $currentmap doesn't have an associated class};
   };
   #unvar temp;
 } {
@@ -167,4 +169,4 @@ libinclude statuslib;
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-05-29
+#nop modif  date: 2016-06-18
