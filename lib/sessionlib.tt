@@ -16,11 +16,13 @@
     #echo {  'loginas' sets a char, loads its class, calls loginsequence and recallchar, };
     #echo {            or lists available chars if none is given};
     #echo {  'loginsequence' sends \$name and \$pass by default - may be overridden};
+    #echo {  'postlogin' does nothing by default - may be overridden};
     #echo {  'recallchar' is the counterpart to 'memchar'/'memalso'};
     #echo {E = empty by default , others may be overridden if needed on a per-mud basis};
 }
 #nop >>;
 #nop - alias 'loginas' to login using a character defined on a chars/ .tt file and recall information about it
+#nop - caller-overrideable 'loginsequence' and 'postlogin'
 #nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
 #nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
 #nop << auto-set $activesession, auto-save map, log connection/disconnection and call 'onconnect', 'onquit', ...;
@@ -166,6 +168,9 @@
   $name;
   $pass;
 }
+#alias postlogin {
+  #nop override this alias on mud tt file if necessary;
+}
 #alias loginas {
   #nop $char is used for filenames;
   #var char {%1};
@@ -184,8 +189,16 @@
   #unvar index;
   #nop otherwise login $char and recall its "memory" (map location, ...);
   #else {
-#nop {    #format {charfile} {chars/%s} {$char}; };
-#nop     classincludefrom $charfile;
+    #nop setup pane files;
+    #system {
+      cd panes;
+      touch ${char}_log.txt;    ln -sf ${char}_log.txt log.txt;
+      touch ${char}_chat.txt;   ln -sf ${char}_chat.txt chat.txt;
+      touch ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
+      echo bar;
+    };
+#nop {     touch ${char}_map.txt;    ln -sf ${char}_map.txt map.txt;};
+    #nop login selected char;
     subclassinclude {chars} {$char};
     #nop the included charfile usually defines $name with exact casing and $pass;
     #if { ! &name } {
@@ -195,12 +208,15 @@
     loginsequence;
     #nop character's memorized map and other variables are recalled;
     recallchar $char;
-    loglog {<024>Logged in as $name<099>};
+    fetchdate;
+    loglog {<024>Logged in as $name on $thedate[1]<099>};
+    #unvar thedate;
     #class temp open;
+    postlogin;
   };
 };
 #nop >>
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-05-28
+#nop modif  date: 2016-06-19

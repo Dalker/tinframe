@@ -219,13 +219,13 @@
 #nop -----------------------------------------
 #nop alias 'goto <dest>' and macro <Num*> : set destination and walk there
 #nop aliases 'mapsymbol' [clear|symbol], 'mapexit' [hide|void|command], 'mapname' [clear|symbol]
-#nop << 'goto room' and then travel path to selected location with <Num*>;
+#nop << 'goto room' and then travel path to selected location with <Num*> and with <F10>;
 #alias goto {
   #map find {%0};
 }
 #macro {\eOj}   {#path walk}
-#nop #macro {\e[21~} {#path walk}
-#nop #macro {\eOP}   {#path walk}
+#macro {\e[21~} {#path walk}
+#macro {\eOP}   {#path walk}
 
 #nop >>
 #nop << Set current room's symbol, name and exit properties: 'mapsymbol S', 'mapname name', mapexit foo [hide|void|command]'
@@ -355,4 +355,4 @@ moveforreal
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-05-30
+#nop modif  date: 2016-06-19

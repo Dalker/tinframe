@@ -51,22 +51,22 @@
 #var clwhite  {[38;5;15m};
 #nop >>
 
-#var loglogfile {logs/log.txt};
+#var loglogfile {panes/log.txt};
 #alias loglog {
   #line log $loglogfile %0;
 };
 
-#var chatlogfile {logs/chat.txt};
+#var chatlogfile {panes/chat.txt};
 #alias chatlog {
   #line log $chatlogfile %0;
 };
 
-#var statuslogfile {logs/status.txt};
+#var statuslogfile {panes/status.txt};
 #alias statuslog {
   #line log $statuslogfile {%1 %2 %3 %4 %5 %6};
 };
 
-#var maplogfile {logs/map.txt};
+#var maplogfile {panes/map.txt};
 #alias maplog {
   #line log $maplogfile %0 ;
 };

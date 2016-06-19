@@ -2,11 +2,15 @@
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
-LOGFILE="logs/log.txt"
-CHATFILE="logs/chat.txt"
-MAPFILE="logs/map.txt"
-STATFILE="logs/status.txt"
+PANEDIR="panes/"
+NOCHAR="start_"
+LOGFILE="log.txt"
+CHATFILE="chat.txt"
+MAPFILE="map.txt"
+STATFILE="status.txt"
 MAINTT="main.tt"
+# size of status pane
+STATSIZE=10 
 
 if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
 then
@@ -31,6 +35,14 @@ else
      
     # act on shell first
     cd $TFMUDSDIR/$SESSION
+
+    mkdir -p $PANEDIR
+    cd $PANEDIR
+    touch $NOCHAR$LOGFILE;  ln -sf $NOCHAR$LOGFILE  $LOGFILE
+    touch $NOCHAR$CHATFILE; ln -sf $NOCHAR$CHATFILE $CHATFILE
+    touch $NOCHAR$STATFILE; ln -sf $NOCHAR$STATFILE $STATFILE
+#     touch $NOCHAR$MAPFILE;  ln -s $NOCHAR$MAPFILE  $MAPFILE
+    cd ..
      
     # setup window and start tintin
 #     tmux new-window    -t $SESSION:1 -k -n "tintin" "tintin -G -t main $MAINTT; tmux kill-session -t $SESSION"
@@ -43,17 +55,17 @@ else
     
     # setup panes and start chat, log, map and status streams
     # first split: left 1.1 | right 1.2 -- secondary column has smaller width than tintin window
-    tmux split-window -t $SESSION:1   -h -l 60 "tail -Fs1 $LOGFILE"
+    tmux split-window -t $SESSION:1   -h -l 60 "tail -Fs1 $PANEDIR$LOGFILE"
     # split left between up 1.3 / down 1.1 -- chat window should have same width as tintin window
-    tmux split-window -t $SESSION:1.1 -b -v "tail -Fs1 $CHATFILE"
+    tmux split-window -t $SESSION:1.1 -b -v "tail -Fs1 $PANEDIR$CHATFILE"
     tmux resize-pane  -t $SESSION:1.3 -y 8
     # split right between up 1.2 / down 1.4 -- map on secondary column, fixed width for map
-    tmux split-window -t $SESSION:1.2 -v -l 22 "tail -Fs0.5 $MAPFILE"
+    tmux split-window -t $SESSION:1.2 -v -l 22 "tail -Fs1.5 $PANEDIR$MAPFILE"
     # split right between up 1.5 / down 1.2 -- last split *if* status file is used
-    if [[ -f $STATFILE ]]; then
-      tmux split-window -t $SESSION:1.2 -b -v "tail -Fs1 $STATFILE"
-      tmux resize-pane  -t $SESSION:1.5 -y 8
-    fi
+#     if [[ -f $STATFILE ]]; then
+      tmux split-window -t $SESSION:1.2 -b -v "tail -Fs1 $PANEDIR$STATFILE"
+      tmux resize-pane  -t $SESSION:1.5 -y $STATSIZE
+#     fi
     # select main pane
     tmux select-pane  -t $SESSION:1.1
         
@@ -64,4 +76,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2014-02-09
-# modif  date: 2016-06-05
+# modif  date: 2016-06-16
