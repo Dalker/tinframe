@@ -40,6 +40,7 @@
 } 
 
 #event {SESSION DISCONNECTED}{
+ #system {cd panes; ln -sf start_log.txt log.txt};
  fetchdate;
  loglog {* * * disconnected from $mudname on $thedate[1] * * *};
  #unvar thedate;
@@ -53,6 +54,7 @@
 }
 
 #event {SESSION TIMED OUT}{
+ #system {cd panes; ln -sf start_log.txt log.txt};
  fetchdate;
  loglog {* * * timed out from $mudname on $thedate[1] * * *};
  #unvar thedate;
