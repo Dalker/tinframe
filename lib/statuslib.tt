@@ -56,9 +56,9 @@
     statuslog { };
   };
   #nop then display the status flags line;
-  #var flagline {$flcol};
+  #var flagline {};
   #foreach {$statusflags[]} {flag} {
-    #format flagline {%s%u$recol } {$flagline} {$flag};
+    #format flagline {%s$flcol%u$recol } {$flagline} {$flag};
   };
   statuslog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
   #nop then display the properties;
