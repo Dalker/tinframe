@@ -129,9 +129,10 @@
   #nop override this alias on mud tt file if necessary;
 }
 
+#var prequitdelay {0.2}
 #alias quit {
   #nop delay actual quit in case 'prequit' script needs to do some stuff before;
-  #delay .2 {#send quit};
+  #delay $prequitdelay {#send quit};
   prequit;
 };
 
@@ -221,4 +222,4 @@
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-06-19
+#nop modif  date: 2016-06-26
