@@ -25,6 +25,7 @@
 #nop - caller-overrideable 'loginsequence' and 'postlogin'
 #nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
 #nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
+#nop determine if this is multinframe
 #nop << auto-set $activesession, auto-save map, log connection/disconnection and call 'onconnect', 'onquit', ...;
 #alias fetchdate {#script thedate {date +"%Y.%m.%d - %H:%M"}}
 #event {SESSION CONNECTED}{
@@ -165,7 +166,7 @@
   postquit;
 }
 #nop >>
-#nop << 'loginas' alias and default login sequence 
+#nop << 'loginas' alias and accesories: loginsequence, postlogin, showallchars, setuppanes
 #alias loginsequence {
   #nop override this alias on mud tt file if necessary;
   $name;
@@ -174,37 +175,44 @@
 #alias postlogin {
   #nop override this alias on mud tt file if necessary;
 }
+#alias showallchars {
+  #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
+  #delay .1 {
+    #echo {<040>possible chars: $allcharnames[1]<099>};
+    #unvar allcharnames;
+  };
+}
+#alias setuppanes {
+  #system {
+    cd panes;
+    touch ${char}_log.txt;    ln -sf ${char}_log.txt log.txt;
+    touch ${char}_chat.txt;   ln -sf ${char}_chat.txt chat.txt;
+    touch ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
+  };
+  #nop {     touch ${char}_map.txt;    ln -sf ${char}_map.txt map.txt;};
+}
 #alias loginas {
   #nop $char is used for filenames;
-  #var char {%1};
 
   #nop show available chars if no char or non-existant char asked for;
   #script {charnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt##};
   #var index 0;
   #list charnames find {%1} index;
   #if { "%1" == "" || $index == 0 } { 
-    #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
-    #delay .1 {
-      #echo {<020>loginas needs a character name for which a config file exists};
-      #echo {<040>possible chars: $allcharnames[1]<099>};
-    };
+    #echo {<020>loginas needs a character name for which a config file exists};
+    showallchars;
   };
   #unvar index;
-  #nop otherwise login $char and recall its "memory" (map location, ...);
+
+  #nop otherwise define and login $char and recall its "memory" (map location, ...);
   #else {
+    #var char {%1};
     #nop setup pane files;
-    #system {
-      cd panes;
-      touch ${char}_log.txt;    ln -sf ${char}_log.txt log.txt;
-      touch ${char}_chat.txt;   ln -sf ${char}_chat.txt chat.txt;
-      touch ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
-      echo bar;
-    };
-#nop {     touch ${char}_map.txt;    ln -sf ${char}_map.txt map.txt;};
+    setuppanes;
     #nop login selected char;
     subclassinclude {chars} {$char};
     #nop the included charfile usually defines $name with exact casing and $pass;
-    #if { ! &name } {
+    #if {&name} {#nop;} {
       #var name {$char};
     };
     #nop default loginsequence is {$name;$pass;} - overrideable for specific mud;
@@ -219,7 +227,79 @@
   };
 };
 #nop >>
+#nop << mutlichar handling
+#var logindelay .5;
+#script temp {echo $MULTI}; #var multi $temp[1]; #unvar temp;
+#if {$multi} {
+  #macro {\eOP} {#one}; #nop <F1>;
+  #macro {\eOQ} {#two}; #nop <F2>;
+  #alias startone {
+    #ses one $mudhost $mudport;
+    #var activesession one;
+    #delay logindelay {
+      #if {"%1" != ""} {
+        #var char %1;
+        #var loglogfile    {panes/${char}_log.txt};
+        #var chatlogfile   {panes/${char}_chat.txt};
+        #var statuslogfile {panes/${char}_status.txt};
+        loginas %1;
+      };
+    };
+  };
+  #alias starttwo {
+    #ses two $mudhost $mudport;
+    #var activesession two;
+    #delay logindelay {
+      #if {"%1" != ""} {
+        #var char %1;
+        #var loglogfile    {panes/${char}_log.txt};
+        #var chatlogfile   {panes/${char}_chat.txt};
+        #var statuslogfile {panes/${char}_status.txt};
+        loginas %1;
+      };
+    };
+  };
+
+  #alias onactive {
+    setuppanes;
+    #system {
+      cd panes;
+      touch ${char}_other.txt; ln -sf ${char}_other.txt status.txt;
+    }
+#nop     sproperty {Session}   $activesession;
+#nop     sproperty {Character} $name;
+    showstatus;
+    #showme {                       <bad>Session: <daf>$activesession      <bad>Character: <daf>$name<099>} {-1};
+    #if {&currentmap} {
+      redrawmap;
+    };
+    #if {"$activesession" == "one"} {
+      #echo {detected session 1};
+      #one #log off;
+      #two #log append panes/other.txt;
+      #two #showme {-- background character is $otherchar --};
+      #two #var otherchar $name;
+    };
+    #if {"$activesession" == "two"} {
+      #echo {detected session 2};
+      #two #log off;
+      #one #log append panes/other.txt;
+      #one #showme {-- background character is $otherchar --};
+      #one #var otherchar $name;
+    };
+    #echo {-- active session is #$activesession with character $name --};
+  };
+
+  #if {&activesession} {#nop;} {#var undetected yes};
+  #if {"$activesession" == "gts" || "$undetected" == "yes"} {
+    #delay .2 {
+      #echo {<bce>start multisession with: <cbf>startone [char], starttwo [char]<099>};
+      showallchars;
+    };
+  };
+  #unvar undetected;
+}; #nop >>
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-06-26
+#nop modif  date: 2016-06-27

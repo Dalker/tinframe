@@ -2,12 +2,18 @@
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
-LOGFILE="logs/log.txt"
-CHATFILE="logs/chat.txt"
-MAPFILE="logs/map.txt"
-STATFILE="logs/status.txt"
-MULTIFILE="logs/other.txt"
+PANEDIR="panes/"
+NOCHAR="start_"
+LOGFILE="log.txt"
+CHATFILE="chat.txt"
+MAPFILE="map.txt"
+STATFILE="status.txt"
+OTHERFILE="other.txt"
 MAINTT="main.tt"
+# size of status pane
+STATSIZE=10 
+# tell TinTin++ we're in multinframe
+export MULTI=1
 
 if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
 then
@@ -33,31 +39,40 @@ else
     # act on shell first
     cd $TFMUDSDIR/$SESSION
      
+    mkdir -p $PANEDIR
+    cd $PANEDIR
+    touch $NOCHAR$LOGFILE;   ln -sf $NOCHAR$LOGFILE   $LOGFILE
+    touch $NOCHAR$CHATFILE;  ln -sf $NOCHAR$CHATFILE  $CHATFILE
+    touch $NOCHAR$STATFILE;  ln -sf $NOCHAR$STATFILE  $STATFILE
+    touch $NOCHAR$OTHERFILE; ln -sf $NOCHAR$OTHERFILE $OTHERFILE
+    touch $MAPFILE;
+    cd ..
+
     # setup window and start tintin
     # auto-detect user's actual shell and use the same in second tmux window
     tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
-    tmux send-keys     -t $SESSION:1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
-    tmux new-window    -t $SESSION:2 -k -n "$(basename $SHELL)"
+    tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
+    tmux new-window    -t $SESSION:3 -k -n "$(basename $SHELL)"
     tmux select-window -t $SESSION:1
     
     # setup panes and start chat, log, map and status streams
     # first split: left 1.1 | right 1.2 -- secondary column has smaller width than tintin window
-    tmux split-window -t $SESSION:1   -h -l 60 "tail -Fs1 $LOGFILE"
+    tmux split-window -t $SESSION:1   -h -l 60 "tail -Fs1 $PANEDIR$LOGFILE"
     # split left between up 1.3 / down 1.1 -- other char's pane should have same width as tintin pane
-    tmux split-window -t $SESSION:1.1 -b -v "less +F -R $MULTIFILE"
-    tmux resize-pane  -t $SESSION:1.3 -y 8
+#     tmux split-window -t $SESSION:1.1 -b -v -l 8 "less +F -R -s -S $PANEDIR$OTHERFILE"
+    tmux split-window -t $SESSION:1.1 -b -v -l 8 "tail -Fs0.5 $PANEDIR$OTHERFILE"
     # split right between up 1.2 / down 1.4 -- map on secondary column, fixed width for map
-    tmux split-window -t $SESSION:1.2 -v -l 22 "tail -Fs0.5 $MAPFILE"
+    tmux split-window -t $SESSION:1.2 -v -l 22 "tail -Fs0.5 $PANEDIR$MAPFILE"
     # split right between up 1.2 / down 1.5 -- chat on secondary column
-    tmux split-window -t $SESSION:1.2 -v "tail -Fs0.5 $CHATFILE"
+    tmux split-window -t $SESSION:1.2 -v -l 6 "tail -Fs0.5 $PANEDIR$CHATFILE"
     # split right between up 1.6 / down 1.2 -- last split *if* status file is used
-    if [[ -f $STATFILE ]]; then
-      tmux split-window -t $SESSION:1.2 -b -v "tail -Fs1 $STATFILE"
-      tmux resize-pane  -t $SESSION:1.6 -y 8
-    fi
+    tmux split-window -t $SESSION:1.2 -b -v -l $STATSIZE "tail -Fs1 $PANEDIR$STATFILE"
+#     tmux resize-pane  -t $SESSION:1.6 -y $STATSIZE
+
+    # actually start TinTin++
+    tmux send-keys     -t $SESSION:1.1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
     # select main pane
     tmux select-pane  -t $SESSION:1.1
-        
     # re-attach session
     exec tmux attach -t $SESSION
   fi
@@ -65,4 +80,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2016-04-15
-# modif  date: 2016-06-05
+# modif  date: 2016-06-27
