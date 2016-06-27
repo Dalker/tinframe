@@ -41,7 +41,7 @@ else
     touch $NOCHAR$LOGFILE;  ln -sf $NOCHAR$LOGFILE  $LOGFILE
     touch $NOCHAR$CHATFILE; ln -sf $NOCHAR$CHATFILE $CHATFILE
     touch $NOCHAR$STATFILE; ln -sf $NOCHAR$STATFILE $STATFILE
-#     touch $NOCHAR$MAPFILE;  ln -s $NOCHAR$MAPFILE  $MAPFILE
+    touch $MAPFILE;
     cd ..
      
     # setup window and start tintin
