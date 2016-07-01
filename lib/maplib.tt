@@ -350,9 +350,48 @@
 #macro {\eOo} {movetoggle};
 moveforreal
 #nop >>
+#nop << extras for multis;
+#if {$multi} {
+  #alias moveone {
+    #macro {\eOt} {#one w};
+    #macro {\eOv} {#one e};
+    #macro {\eOx} {#one n};
+    #macro {\eOr} {#one s};
+    #macro {\eOw} {#one nw};
+    #macro {\eOy} {#one ne};
+    #macro {\eOs} {#one se};
+    #macro {\eOq} {#one sw};
+    #macro {\eOm} {#one d};
+    #macro {\eOk} {#one u};
+    #echo {keypad will now provide movement for #one};
+    #var moving {one};
+  };
+  #alias movetwo {
+    #macro {\eOt} {#two w};
+    #macro {\eOv} {#two e};
+    #macro {\eOx} {#two n};
+    #macro {\eOr} {#two s};
+    #macro {\eOw} {#two nw};
+    #macro {\eOy} {#two ne};
+    #macro {\eOs} {#two se};
+    #macro {\eOq} {#two sw};
+    #macro {\eOm} {#two d};
+    #macro {\eOk} {#two u};
+    #echo {keypad will now provide movement for #two};
+    #var moving {two};
+  };
+  #alias moveother {
+    #if     { "$moving" == "one" } { movetwo };
+    #elseif { "$moving" == "two" } { moveone };
+    #elseif { "$activesession" == "two" } { moveone };
+    #elseif { "$activesession" == "one" } { movetwo };
+    #else   { #echo {moveother : no \$activesession - ack!...}};
+  };
+  #macro {\eOn} {moveother};
+}
 
 #nop #echo {class maplib (re)loaded};
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-06-19
+#nop modif  date: 2016-06-28
