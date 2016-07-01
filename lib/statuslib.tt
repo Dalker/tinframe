@@ -3,21 +3,26 @@
 #nop .-----------------.
 #alias statushelp { #nop << help alias;
     #echo {--- TinFrame status pane handling --- };
-    #echo {showstatus              : update status pane (usually automatic) };
-    #echo {flagon/flagoff <flag>   : set or clear a flag};
-    #echo {clearflags              : clear all flags};
-    #echo {flagif <flag> <trigger> : flagon  on ^trigger mud line};
-    #echo {unflagif <flag> <trig>  : flagoff on ^trig    mud line};
-    #echo {sproperty <key> <value> : set property key->value};
-    #echo {spropclear <key>        : clear a property, or all if no key given};
-    #echo {buffon/buffoff <buff>   : set buff as active/inactive};
-    #echo {buffif <buff> <trigger> : buffon  on ^trigger mud line};
-    #echo {unbuffif <buff> <trig>  : buffoff on ^trig    mud line};
-    #echo {tossbuff <buff>         : remove buff from all lists};
-    #echo {@flag[on|off] {<flag>}  : booleans for use in conditionals};
-    #echo {@buff[on|off] {<buff>}  : booleans for use in conditionals};
-    #echo {foreachbuff {<action>}  : perform action on %%%1, replaced by each buff (buggy!)};
-    #echo {foreachflag {<action>}  : perform action on %%%1, replaced by each flag (buggy!)};
+    #echo {showstatus                  : update status pane (usually automatic) };
+    #echo {flagon/flagoff <flag>       : set or clear a flag};
+    #echo {clearflags                  : clear all flags};
+    #echo {flagif <flag> <trigger>     : flagon  on ^trigger mud line};
+    #echo {unflagif <flag> <trig>      : flagoff on ^trig    mud line};
+    #echo {sproperty <key> <value>     : set property key->value};
+    #echo {spropclear <key>            : clear a property, or all if no key given};
+    #echo {buffon/buffoff <buff>       : set buff as active/inactive};
+    #echo {buffif <buff> <trigger>     : buffon  on ^trigger mud line};
+    #echo {unbuffif <buff> <trig>      : buffoff on ^trig    mud line};
+    #echo {tossbuff <buff>             : remove buff from all lists, remove all if none specified};
+    #echo {isready/isntready <skill>   : set skill/spell as ready/unready};
+    #echo {isreadyif <skill> <trigger> : isready   on ^trigger mud line};
+    #echo {isntreadyif <skill> <trig>  : isntready on ^trig    mud line};
+    #echo {tossready <skill>           : remove skill from all lists, remove all if none specified};
+    #echo {@flag[on|off] {<flag>}      : booleans for use in conditionals};
+    #echo {@buff[on|off] {<buff>}      : booleans for use in conditionals};
+    #echo {@ready[on|off] {<skill>}    : booleans for use in conditionals};
+    #echo {foreachbuff {<action>}      : perform action on %%%1, replaced by each buff (buggy!)};
+    #echo {foreachflag {<action>}      : perform action on %%%1, replaced by each flag (buggy!)};
     #echo {autobuff/custombuff/stopbuff - partially implemented for bot-allowing muds};
 };
 #nop >>;
@@ -253,7 +258,7 @@
     #nop add skill/spell to display list, in case it wasn't there yet;
     #var dispready[%1] {1};
     #nop add skill/spell to ready list;
-    #var isready[%1] {on};
+    #var isready[%1] {yes};
     showstatus;
   }
 }
@@ -287,7 +292,7 @@
 #nop >>
 
 #nop booleans provided for use in conditionals
-#nop << @flagon{flag} @flagoff{flag} @buffon{buff} @buffoff{buff}
+#nop << @flagon{flag} @flagoff{flag} @buffon{buff} @buffoff{buff} @isready{skill} @isntready{skill}
 #function flagon {
     #if { "$statusflags[%1]" == "on" } {
       #return 1; #nop true;
@@ -311,6 +316,20 @@
 }
 #function buffoff {
     #if { "$activebuffs[%1]" == "on" } {
+      #return 0; #nop false;
+    } {
+      #return 1; #nop true;
+    };
+}
+#function isready {
+    #if { "$isready[%1]" == "yes" } {
+      #return 1; #nop true;
+    } {
+      #return 0; #nop false;
+    };
+}
+#function isntready {
+    #if { "$isready[%1]" == "yes" } {
       #return 0; #nop false;
     } {
       #return 1; #nop true;
