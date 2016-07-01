@@ -187,7 +187,7 @@
     cd panes;
     touch ${char}_log.txt;    ln -sf ${char}_log.txt log.txt;
     touch ${char}_chat.txt;   ln -sf ${char}_chat.txt chat.txt;
-    touch ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
+    echo --== $char status ==-- > ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
   };
   #nop {     touch ${char}_map.txt;    ln -sf ${char}_map.txt map.txt;};
 }
@@ -239,9 +239,8 @@
     #delay logindelay {
       #if {"%1" != ""} {
         #var char %1;
-        #var loglogfile    {panes/${char}_log.txt};
-        #var chatlogfile   {panes/${char}_chat.txt};
-        #var statuslogfile {panes/${char}_status.txt};
+        setuppanes;
+        #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
         loginas %1;
       };
     };
@@ -252,36 +251,28 @@
     #delay logindelay {
       #if {"%1" != ""} {
         #var char %1;
-        #var loglogfile    {panes/${char}_log.txt};
-        #var chatlogfile   {panes/${char}_chat.txt};
-        #var statuslogfile {panes/${char}_status.txt};
+        setuppanes;
+        #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
         loginas %1;
       };
     };
   };
 
   #alias onactive {
-    setuppanes;
-    #system {
-      cd panes;
-      touch ${char}_other.txt; ln -sf ${char}_other.txt status.txt;
-    }
-#nop     sproperty {Session}   $activesession;
-#nop     sproperty {Character} $name;
-    showstatus;
-    #showme {                       <bad>Session: <daf>$activesession      <bad>Character: <daf>$name<099>} {-1};
-    #if {&currentmap} {
-      redrawmap;
+    #if {"$activesession" != "gts"} {
+      setuppanes;
+      #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
     };
+    showstatus;
+    #showme {                       <bad>session: <daf>$activesession      <bad>character: <daf>$name<099>} {-1};
+    #if {&currentmap} {redrawmap};
     #if {"$activesession" == "one"} {
-      #echo {detected session 1};
       #one #log off;
       #two #log append panes/other.txt;
       #two #showme {-- background character is $otherchar --};
       #two #var otherchar $name;
     };
     #if {"$activesession" == "two"} {
-      #echo {detected session 2};
       #two #log off;
       #one #log append panes/other.txt;
       #one #showme {-- background character is $otherchar --};
