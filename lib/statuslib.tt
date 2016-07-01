@@ -39,84 +39,72 @@
 #nop >>;
 
 #nop displaying in status pane
-#nop << showstatus
+#nop << showstatus - colors can be overridden
 #nop colors for on/off buffs (can be overrridden);
-#var oncol  {$cgreen};
-#var offcol {$cgray}; 
-#var keycol {$clblue};
-#var valcol {$cyellow};
-#var flcol  {$ccyan};
-#var recol  {$cwhite};
+#var boncol  {$cgreen}; #var boffcol {$cgray}; 
+#var pkeycol {$clblue}; #var pvalcol {$cyellow};
+#var flagcol {$ccyan};
+#var recol   {$cwhite};
 
-#alias showstatus {
-  #nop first clear the status pane;
-  #var thecount 0;
-  #while { $thecount < 7 } {
-    #math thecount { $thecount + 1};
-    statuslog { };
+#alias showpush { #nop <<;
+  #var next {%1};
+  #if {&tempc} {
+    statuslog {$templ$tempc$next$recol};
+    #unvar tempc;
+    #unvar templ;
+  }; 
+  #elseif {&templ} {
+    #format tempc {%-20s} {$next};
   };
-  #nop then display the status flags line;
+  #else {
+    #format templ {%-20s} {$next};
+  };
+}#nop >>;
+#alias showflush { #nop <<;
+  #if &templ {
+    #if &tempc {
+      statuslog {$templ$tempc$recol};
+    } {
+      statuslog {$templ$recol};
+    };
+    #unvar tempc;
+    #unvar templ;
+  };
+}#nop >>;
+#alias showflags { #nop <<;
   #var flagline {};
   #foreach {$statusflags[]} {flag} {
-    #format flagline {%s$flcol%u$recol } {$flagline} {$flag};
+    #format flagline {%s$flagcol%u$recol } {$flagline} {$flag};
   };
   statuslog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
-  #nop then display the properties;
+  #unvar flagline;
+}#nop >>;
+#alias showprops { #nop <<;
   #var propline {};
   #foreach {$statusprops[]} {prop} {
-#nop     #format propline {%s%s$recol  } {$propline} {$keycol$prop: $valcol$statusprops[$prop]};
-#nop   statuslog {$propline};
-    #var nextprop {$keycol$prop: $valcol$statusprops[$prop]$recol };
-    #if {&tempc} {
-      statuslog {$templ$tempc$nextprop};
-      #unvar tempc;
-      #unvar templ;
-    }; 
-    #elseif {&templ} {
-      #format tempc {%-18s} {$nextprop};
-    };
-    #else {
-      #format templ {%-18s} {$nextprop};
-    };
+    #var nextprop {$pkeycol$prop: $pvalcol$statusprops[$prop]};
+    showpush {$nextprop};
   };
-  #if &templ {
-    #if &tempc {
-      statuslog {$templ$tempc$recol };
-    } {
-      statuslog {$templ$recol };
-    };
-    #unvar tempc;
-    #unvar templ;
-  };
-  #nop finally display the buffs;
+  showflush;
+}#nop >>;
+#alias showbuffs { #nop <<;
   #foreach {$dispbuffs[]} {buff} {
     #if {&activebuffs[$buff]} {
-      #var nextbuff {$oncol$buff$recol };
+      #var nextbuff {$boncol$buff};
     }{
-      #var nextbuff {$offcol$buff$recol };
+      #var nextbuff {$boffcol$buff};
     };
-    #if {&tempc} {
-      statuslog {$templ$tempc$nextbuff};
-      #unvar tempc;
-      #unvar templ;
-    }; 
-    #elseif {&templ} {
-      #format tempc {%-20s} {$nextbuff};
-    };
-    #else {
-      #format templ {%-20s} {$nextbuff};
-    };
+    showpush {$nextbuff};
   };
-  #if &templ {
-    #if &tempc {
-      statuslog {$templ$tempc$recol };
-    } {
-      statuslog {$templ$recol };
-    };
-    #unvar tempc;
-    #unvar templ;
-  };
-};
+  showflush;
+}#nop >>;
+#alias showstatus { #nop overrideable to change order <<;
+  #nop first clear the status pane;
+  #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1};statuslog { }};
+  showflags; #nop display the status flags line;
+  showprops; #nop display the properties;
+  showbuffs; #nop display the buffs;
+};#nop >>;
 #nop >>;
 
 #nop flag status handling;
@@ -303,4 +291,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-06-17
+#nop modif  date: 2016-07-01
