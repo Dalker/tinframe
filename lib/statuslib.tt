@@ -25,7 +25,7 @@
 #nop associative tables: statusflags, dispbuffs, activebuffs, autobuffs, queuedbuffs, custombuffs, statusprops;
 #nop N.B.: queuedbuffs is purely a placeholder, not implemented on framework 
 #nop       (can be used on a per-mud basis combined with autobuff/custombuff/stopbuff)
-#nop << make sure the hashes exist - but make sure they don't get killed when reloading class;
+#nop << make sure the hashes exist - and make sure they don't get killed when reloading class;
 #nop these lists must live in 'temp', so that they don't get erased when reloading the libs;
 #class temp open;
 #if {&statusflags} {#nop;} {#var statusflags {}};
@@ -35,16 +35,19 @@
 #if {&queuedbuffs} {#nop;} {#var queuedbuffs {}};
 #if {&custombuffs} {#nop;} {#var custombuffs {}};
 #if {&statusprops} {#nop;} {#var statusprops {}};
+#if {&dispready}   {#nop;} {#var dispready   {}};
+#if {&isready}     {#nop;} {#var isready     {}};
 #class statuslib open;
 #nop >>;
 
 #nop displaying in status pane
 #nop << showstatus - colors can be overridden
 #nop colors for on/off buffs (can be overrridden);
-#var boncol  {$cgreen}; #var boffcol {$cgray}; 
-#var pkeycol {$clblue}; #var pvalcol {$cyellow};
-#var flagcol {$ccyan};
-#var recol   {$cwhite};
+#var boncol   {$cgreen};  #var boffcol    {$cgray}; 
+#var pkeycol  {$clblue};  #var pvalcol    {$cyellow};
+#var readycol {$clred}; #var unreadycol {$cgrey};
+#var flagcol  {$ccyan};
+#var recol    {$cwhite};
 
 #alias showpush { #nop <<;
   #var next {%1};
@@ -84,7 +87,7 @@
   #foreach {$statusprops[]} {prop} {
     #var nextprop {$pkeycol$prop: $pvalcol$statusprops[$prop]};
     showpush {$nextprop};
-  };
+  }; #unvar nextprop;
   showflush;
 }#nop >>;
 #alias showbuffs { #nop <<;
@@ -95,15 +98,27 @@
       #var nextbuff {$boffcol$buff};
     };
     showpush {$nextbuff};
-  };
+  }; #unvar nextbuff;
+  showflush;
+}#nop >>;
+#alias showready { #nop <<;
+  #foreach {$dispready[]} {skill} {
+    #if {&isready[$skill]} {
+      #var nextskill {$readycol$skill};
+    }{
+      #var nextskill {$unreadycol$skill};
+    };
+    showpush {$nextskill};
+  }; #unvar nextskill;
   showflush;
 }#nop >>;
 #alias showstatus { #nop overrideable to change order <<;
   #nop first clear the status pane;
   #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1};statuslog { }};
-  showflags; #nop display the status flags line;
-  showprops; #nop display the properties;
-  showbuffs; #nop display the buffs;
+  showflags; #nop display status flags line;
+  showprops; #nop display properties;
+  showbuffs; #nop display buffs;
+  showready; #nop display ready skills;
 };#nop >>;
 #nop >>;
 
@@ -147,17 +162,15 @@
 #nop >>
 
 #nop property status handling;
-#nop << sproperty{key}{val}, spropclear{key};
-#nop define the "methods";
-#alias sproperty {
+#alias sproperty { #nop << sproperty {key} {value};
   #if {"%1" == ""} {
     #echo {> sprop needs a property name <};
   }{
     #var {statusprops[%1]} {%2};
     showstatus;
   };
-}
-#alias spropclear {
+}; #nop >>
+#alias spropclear { #nop << clears all if no argument;
   #if {"%1" == ""} {
     #var statusprops {};
     showstatus;
@@ -165,8 +178,7 @@
     #unvar {statusprops[%1]};
     showstatus;
   };
-}
-#nop >>
+}; #nop >>
 
 #nop buff status handling
 #nop << buffon/buffoff {buffname} - make buff active/inactive;
@@ -213,13 +225,63 @@
   };
 };
 #nop >>;
-#nop << tossbuff{name} -- removes buff from all tables
+#nop << tossbuff{name} -- removes buff from all tables, removes all if no argument
 #alias tossbuff {
-  #unvar autobuffs[%1];
-  #unvar dispbuffs[%1];
-  #unvar activebuffs[%1];
-  #unvar custombuffs[%1];
-  #unvar queuedbuffs[%1];
+  #if {"%1" == ""} {
+    #var autobuffs   {};
+    #var dispbuffs   {};
+    #var activebuffs {};
+    #var custombuffs {};
+    #var queuedbuffs {};
+  }{
+    #unvar autobuffs[%1];
+    #unvar dispbuffs[%1];
+    #unvar activebuffs[%1];
+    #unvar custombuffs[%1];
+    #unvar queuedbuffs[%1];
+  };
+  showstatus;
+}
+#nop >>
+
+#nop ready status handling
+#nop << isready/isntready {skill|spell} - show whether skill/spell is ready to use or not;
+#alias isready {
+  #if {"%1" == ""} {
+    #echo {> isready needs a skill/spell name <};
+  }{
+    #nop add skill/spell to display list, in case it wasn't there yet;
+    #var dispready[%1] {1};
+    #nop add skill/spell to ready list;
+    #var isready[%1] {on};
+    showstatus;
+  }
+}
+#alias isntready {
+  #if {"%1" == ""} {
+    #echo {> isntready needs a flag name <};
+  }{
+    #nop add skill/spell to display list, in case it wasn't there yet;
+    #var dispready[%1] {1};
+    #nop remove skill/spell from ready list;
+    #unvar isready[%1];
+    showstatus;
+  }
+}
+#nop >>;
+#nop << ready/unready detectors;
+#alias isreadyif   {#high {^%2} {<bda>}; #act {^%2} {isready {%1}}};
+#alias isntreadyif {#high {^%2} {<bda>}; #act {^%2} {isntready {%1}}};
+#nop >>;
+#nop << tossready{name} -- clears all if no argument
+#alias tossready {
+  #if {"%1" == ""} {
+    #var dispready {};
+    #var isready   {};
+  }{
+    #unvar dispready[%1];
+    #unvar isready[%1];
+  };
   showstatus;
 }
 #nop >>
