@@ -51,17 +51,24 @@
 #var clwhite  {[38;5;15m};
 #nop >>
 
-#var loglogfile {panes/log.txt};
+#if {&char} {
+  #var loglogfile    {panes/${char}_log.txt};
+  #var chatlogfile   {panes/${char}_chat.txt};
+  #var statuslogfile {panes/${char}_status.txt};
+} {
+  #var loglogfile    {panes/log.txt};
+  #var chatlogfile   {panes/chat.txt};
+  #var statuslogfile {panes/status.txt};
+}
+
 #alias loglog {
   #line log $loglogfile %0;
 };
 
-#var chatlogfile {panes/chat.txt};
 #alias chatlog {
   #line log $chatlogfile %0;
 };
 
-#var statuslogfile {panes/status.txt};
 #alias statuslog {
   #line log $statuslogfile {%1 %2 %3 %4 %5 %6};
 };
