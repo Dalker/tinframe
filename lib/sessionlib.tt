@@ -69,7 +69,7 @@
 }
 #nop >>
 #nop << auxiliary functions for 'onquit', 'onconnect' and friends : memchar, memalso, recallchar;
-#alias memchar {
+#alias memchar {#nop <<;
   #format {memfile} {%s%s%s} {chars/} {%1} {.mf};
   #system {rm $memfile 2> /dev/null};
 
@@ -82,27 +82,15 @@
 
     #echo {memchar for $name: saved map $currentmap vnum $lastvnum};
   };
-  #else {
-    #line log {$memfile} {#echo no map information saved for %1};
-  };
+  #else {#line log {$memfile} {#echo no map information saved for %1}};
 
   #nop save status information, if any;
-  #foreach $dispbuffs[] buff {
-    #line log {$memfile} {#var dispbuffs[$buff] {saved}};
-  };
-  #foreach $activebuffs[] buff {
-    #line log {$memfile} {#var activebuffs[$buff] {saved}};
-  };
-  #foreach $autobuffs[] buff {
-    #line log {$memfile} {#var autobuffs[$buff] {$autobuffs[$buff]}};
-  };
-  #foreach $statusflags[] flag {
-    #line log {$memfile} {#var statusflags[$flag] {$statusflags[$flag]}};
-  };
-  #foreach $statusprops[] key {
-    #line log {$memfile} {#var statusprops[$key] {$statusprops[$key]}};
-  };
-};
+  #foreach $dispbuffs[]   buff {#line log {$memfile} {#var dispbuffs[$buff]   {saved}}};
+  #foreach $activebuffs[] buff {#line log {$memfile} {#var activebuffs[$buff] {saved}}};
+  #foreach $autobuffs[]   buff {#line log {$memfile} {#var autobuffs[$buff]   {$autobuffs[$buff]}}};
+  #foreach $statusflags[] flag {#line log {$memfile} {#var statusflags[$flag] {$statusflags[$flag]}}};
+  #foreach $statusprops[] key  {#line log {$memfile} {#var statusprops[$key]  {$statusprops[$key]}}};
+};#nop >>
 
 #alias memalso {
   #if &char {
@@ -117,13 +105,8 @@
 };
 #nop >>
 #nop << default versions of 'onconnect', 'onactive', 'prequit', 'quit' override, 'onquit', 'postquit', 'ontimeout', 'posttimeout';
-#alias onconnect {
-  #nop override this alias on mud tt file if necessary;
-}
-
-#alias onactive {
-  #nop override this alias on mud tt file if necessary;
-}
+#alias onconnect {#nop override this alias on mud tt file if necessary;}
+#alias onactive {setuppanes; #nop override this alias on mud tt file if necessary;}
 
 #alias prequit {
   #nop stuff to be done before 'quit' command is sent to mud;
@@ -167,33 +150,45 @@
 }
 #nop >>
 #nop << 'loginas' alias and accesories: loginsequence, postlogin, showallchars, setuppanes
-#alias loginsequence {
-  #nop override this alias on mud tt file if necessary;
+#alias loginsequence { #nop << override this alias on mud tt file if necessary;
   $name;
   $pass;
-}
-#alias postlogin {
-  #nop override this alias on mud tt file if necessary;
-}
-#alias showallchars {
+}; #nop >>
+#alias postlogin { #nop << override this alias on mud tt file if necessary;
+}; #nop >>
+#alias showallchars { #nop <<;
   #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
-  #delay .1 {
-    #echo {<040>possible chars: $allcharnames[1]<099>};
-    #unvar allcharnames;
-  };
-}
-#alias setuppanes {
-  #system {
+  #echo {<040>possible chars: $allcharnames[1]<099>};
+  #unvar allcharnames;
+}; #nop >>
+#alias setuppanes { #nop << called by setupchar, and by multi changes;
+  #if {&char} {#system {
     cd panes;
-    touch ${char}_log.txt;    ln -sf ${char}_log.txt log.txt;
-    touch ${char}_chat.txt;   ln -sf ${char}_chat.txt chat.txt;
+    touch ${char}_log.txt;  ln -sf ${char}_log.txt  log.txt;
+    touch ${char}_chat.txt; ln -sf ${char}_chat.txt chat.txt;
+#nop     touch ${char}_map.txt;  ln -sf ${char}_map.txt  map.txt;
     echo --== $char status ==-- > ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
+  }} {
+    setstartlogs;
   };
-  #nop {     touch ${char}_map.txt;    ln -sf ${char}_map.txt map.txt;};
-}
-#alias loginas {
-  #nop $char is used for filenames;
-
+  #if {$multi > 0} {
+    #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
+  };
+  #if {$multi > 1} {
+    #system {cd panes; touch ${char}_third.txt; ln -sf ${char}_third.txt third.txt};
+  };
+}; #nop >>
+#alias setupchar { #nop << optional: give char as argument (otherwise $char is used);
+  #if {"%1" != ""} {#var char %1};
+  #if {&char} {
+    #var loglogfile    {panes/${char}_log.txt};
+    #var chatlogfile   {panes/${char}_chat.txt};
+    #var statuslogfile {panes/${char}_status.txt};
+    setuppanes;
+    subclassinclude {chars} {$char};
+  }
+}; #nop >>
+#alias loginas {; #nop << with $char as argument;
   #nop show available chars if no char or non-existant char asked for;
   #script {charnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt##};
   #var index 0;
@@ -207,25 +202,14 @@
   #nop otherwise define and login $char and recall its "memory" (map location, ...);
   #else {
     #var char {%1};
-    #nop setup pane files;
-    setuppanes;
-    #nop login selected char;
-    subclassinclude {chars} {$char};
-    #nop the included charfile usually defines $name with exact casing and $pass;
-    #if {&name} {#nop;} {
-      #var name {$char};
-    };
-    #nop default loginsequence is {$name;$pass;} - overrideable for specific mud;
+    setupchar $char; #nop notably sets up panes and recalls char's class file;
+    #if {&name} {#nop;} {#var name {$char}}; #nop in case char's file didn't define $name;
+    recallchar $char; #nop character's memorized map and other variables are recalled;
     loginsequence;
-    #nop character's memorized map and other variables are recalled;
-    recallchar $char;
-    fetchdate;
-    loglog {<024>Logged in as $name on $thedate[1]<099>};
-    #unvar thedate;
-    #class temp open;
+    fetchdate; loglog {<024>Logged in as $name on $thedate[1]<099>}; #unvar thedate;
     postlogin;
   };
-};
+};#nop >>
 #nop >>
 #nop << mutlichar handling
 #var logindelay .5;
@@ -233,54 +217,51 @@
 #if {$multi} {
   #macro {\eOP} {#one}; #nop <F1>;
   #macro {\eOQ} {#two}; #nop <F2>;
-  #alias startone {
-    #ses one $mudhost $mudport;
-    #var activesession one;
-    #delay logindelay {
-      #if {"%1" != ""} {
-        #var char %1;
-        setuppanes;
-        #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
-        loginas %1;
-      };
+  #alias startmulti { #nop << startmulti <session> [char];
+    #var activesession %1;
+    #ses $activesession $mudhost $mudport;
+    #if {"%2" != ""} {
+      #var char %2;
+      loginas %2;
     };
-  };
-  #alias starttwo {
-    #ses two $mudhost $mudport;
-    #var activesession two;
-    #delay logindelay {
-      #if {"%1" != ""} {
-        #var char %1;
-        setuppanes;
-        #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
-        loginas %1;
-      };
+    #if {&name} {
+      #var otherchar $name;
     };
-  };
-
-  #alias onactive {
-    #if {"$activesession" != "gts"} {
+  };#nop >>;
+  #alias startone {startmulti {one} {%1}};
+  #alias starttwo {startmulti {two} {%1}};
+  #if {$multi > 1} {#alias starttre {startmulti {tre} {%1}}};
+  #alias onactive { #nop << standard override for multis;
+    #if {"$activesession" == "gts"} {
+      #echo {<bce>restart multisession with: <cbf>startone [char], starttwo [char]<099>};
       setuppanes;
-      #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
+      showallchars;
     };
-    showstatus;
-    #showme {                       <bad>session: <daf>$activesession      <bad>character: <daf>$name<099>} {-1};
-    #if {&currentmap} {redrawmap};
-    #if {"$activesession" == "one"} {
-      #one #log off;
-      #two #log append panes/other.txt;
-      #two #showme {-- background character is $otherchar --};
-      #two #var otherchar $name;
+    #nop Otherwise we're in a true session;
+    #else {
+      setuppanes;
+      showstatus;
+      #if {&currentmap} {redrawmap};
+      #if {"$activesession" == "one"} {
+        #one #log off;
+        #two #log append panes/other.txt;
+        #two #showme {-- background character is $otherchar --};
+        #two #var otherchar $name;
+        #one #unvar inthebackground;
+        #two #var inthebackground yes;
+      };
+      #if {"$activesession" == "two"} {
+        #two #log off;
+        #one #log append panes/other.txt;
+        #one #showme {-- background character is $otherchar --};
+        #one #var otherchar $name;
+        #two #unvar inthebackground;
+        #one #var inthebackground yes;
+      };
+      #echo {-- active session is #$activesession with character $name --};
     };
-    #if {"$activesession" == "two"} {
-      #two #log off;
-      #one #log append panes/other.txt;
-      #one #showme {-- background character is $otherchar --};
-      #one #var otherchar $name;
-    };
-    #echo {-- active session is #$activesession with character $name --};
-  };
-
+  };#nop >>;
+  #nop << show message if gts (never sessioned, or quit session and detected gts);
   #if {&activesession} {#nop;} {#var undetected yes};
   #if {"$activesession" == "gts" || "$undetected" == "yes"} {
     #delay .2 {
@@ -289,8 +270,9 @@
     };
   };
   #unvar undetected;
+  #nop >>;
 }; #nop >>
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-06-27
+#nop modif  date: 2016-07-03

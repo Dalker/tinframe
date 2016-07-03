@@ -51,32 +51,18 @@
 #var clwhite  {[38;5;15m};
 #nop >>
 
-#if {&char} {
-  #var loglogfile    {panes/${char}_log.txt};
-  #var chatlogfile   {panes/${char}_chat.txt};
-  #var statuslogfile {panes/${char}_status.txt};
-} {
-  #var loglogfile    {panes/log.txt};
-  #var chatlogfile   {panes/chat.txt};
-  #var statuslogfile {panes/status.txt};
-}
-
-#alias loglog {
-  #line log $loglogfile %0;
-};
-
-#alias chatlog {
-  #line log $chatlogfile %0;
-};
-
-#alias statuslog {
-  #line log $statuslogfile {%1 %2 %3 %4 %5 %6};
-};
-
 #var maplogfile {panes/map.txt};
-#alias maplog {
-  #line log $maplogfile %0 ;
-};
+#alias setstartlogs {
+  #var loglogfile    {panes/start_log.txt};
+  #var chatlogfile   {panes/start_chat.txt};
+  #var statuslogfile {panes/start_status.txt};
+}
+#if {&char} {#nop;} {setstartlogs}
+
+#alias loglog    {#line log $loglogfile    %0};
+#alias chatlog   {#line log $chatlogfile   %0};
+#alias statuslog {#line log $statuslogfile %0};
+#alias maplog    {#line log $maplogfile    %0};
 
 #nop Based on a TinTin++ website example: 'log [on|off|filename]' to log all into dated file - modified to allow choice of named file instead
 #nop << log [on|off|filename];
@@ -119,4 +105,4 @@
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-06-17
+#nop modif  date: 2016-07-03

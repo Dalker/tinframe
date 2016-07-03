@@ -33,10 +33,10 @@
 #alias redrawmap {#MAP {map} {59x22} {$maplogfile}};
 
 #alias setmap {
-  #variable currentmap %1;
+  #var currentmap %1;
   #format mapfile {maps/%s.map} {$currentmap};
   #format mclfile {maps/%s.tt}  {$currentmap};
-  #EVENT {MAP ENTER ROOM} {redrawmap};
+  #EVENT {MAP ENTER ROOM} {#if {&inthebackground} {#nop;} {redrawmap}};
 }
 
 #alias unsetmap {
@@ -394,4 +394,4 @@ moveforreal
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-06-28
+#nop modif  date: 2016-07-03
