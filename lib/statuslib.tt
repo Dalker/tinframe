@@ -48,9 +48,9 @@
 #nop displaying in status pane
 #nop << showstatus - colors can be overridden
 #nop colors for on/off buffs (can be overrridden);
-#var boncol   {$cgreen};  #var boffcol    {$cgray}; 
-#var pkeycol  {$clblue};  #var pvalcol    {$cyellow};
-#var readycol {$clred}; #var unreadycol {$cgrey};
+#var boncol   {$cgreen};   #var boffcol    {$cgray}; 
+#var pkeycol  {$clblue};   #var pvalcol    {$cyellow};
+#var readycol {$cmagenta}; #var unreadycol {$cgray};
 #var flagcol  {$ccyan};
 #var recol    {$cwhite};
 
@@ -119,7 +119,7 @@
 }#nop >>;
 #alias showstatus { #nop overrideable to change order <<;
   #nop first clear the status pane;
-  #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1};statuslog { }};
+  #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1}; statuslog { }};
   showflags; #nop display status flags line;
   showprops; #nop display properties;
   showbuffs; #nop display buffs;
@@ -275,7 +275,7 @@
 }
 #nop >>;
 #nop << ready/unready detectors;
-#alias isreadyif   {#high {^%2} {<bda>}; #act {^%2} {isready {%1}}};
+#alias isreadyif   {#high {^%2} {$readycol}; #act {^%2} {isready {%1}}};
 #alias isntreadyif {#high {^%2} {<bda>}; #act {^%2} {isntready {%1}}};
 #nop >>;
 #nop << tossready{name} -- clears all if no argument
