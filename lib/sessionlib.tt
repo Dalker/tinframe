@@ -211,25 +211,58 @@
   };
 };#nop >>
 #nop >>
-#nop << mutlichar handling
 #var logindelay .5;
+#nop << mutlichar handling
 #script temp {echo $MULTI}; #var multi $temp[1]; #unvar temp;
 #if {$multi} {
-  #macro {\eOP} {#one}; #nop <F1>;
-  #macro {\eOQ} {#two}; #nop <F2>;
-  #alias startmulti { #nop << startmulti <session> [char];
-    #var activesession %1;
-    #ses $activesession $mudhost $mudport;
+  #function sessionisgts {
+    #if {&activesession && "$activesession" != "gts"} {#return 0} {#return 1};
+  };
+  #nop initialize persistent gts variables if no session exists at all;
+  #if {&activesession} {#nop;} {
+    #class temp open;
+    #list  sessions clear;
+    #var   sessionindex    0;
+    #var   maxsessionindex 0;
+    #class sessionlib open;
+  };
+  #alias newsession {
+    #list sessions add %1;
+    #list sessions size maxsessionindex;
+    #var  sessionindex  maxsessionindex;
+  };
+  #alias gotoprevsession {
+    #if {$sessionindex == 1} {
+      #var sessionindex $maxsessionindex;
+    } {
+      #math sessionindex {$sessionindex - 1};
+    };
+    #format thecommand {#%s} {$sessions[$sessionindex]};
+    $thecommand;
+    #unvar thecommand;
+  };
+  #alias gotonextsession {
+    #if {$sessionindex == $maxsessionindex} {
+      #var sessionindex 1;
+    } {
+      #math sessionindex {$sessionindex + 1};
+    };
+    #format thecommand {#%s} {$sessions[$sessionindex]};
+    $thecommand;
+    #unvar thecommand;
+  };
+  #macro {\eOP} {#gts gotoprevsession}; #nop <F1>;
+  #macro {\eOQ} {#gts gotonextsession}; #nop <F2>;
+  #alias startsession { #nop << startsession <session> [char];
+    #gts newsession %1; 
+    #ses %1 $mudhost $mudport;
     #if {"%2" != ""} {
       #var char %2;
       loginas %2;
     };
-    #if {&name} {
-      #var otherchar $name;
-    };
-  };#nop >>;
-  #alias startone {startmulti {one} {%1}};
-  #alias starttwo {startmulti {two} {%1}};
+  }; #nop >>;
+  #alias startone {startsession {one} {%1}};
+  #alias starttwo {startsession {two} {%1}};
   #if {$multi > 1} {#alias starttre {startmulti {tre} {%1}}};
   #alias onactive { #nop << standard override for multis;
     #if {"$activesession" == "gts"} {
@@ -262,14 +295,12 @@
     };
   };#nop >>;
   #nop << show message if gts (never sessioned, or quit session and detected gts);
-  #if {&activesession} {#nop;} {#var undetected yes};
-  #if {"$activesession" == "gts" || "$undetected" == "yes"} {
+  #if {@sessionisgts} {
     #delay .2 {
       #echo {<bce>start multisession with: <cbf>startone [char], starttwo [char]<099>};
       showallchars;
     };
   };
-  #unvar undetected;
   #nop >>;
 }; #nop >>
 #nop------------------------
