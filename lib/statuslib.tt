@@ -48,11 +48,10 @@
 #nop displaying in status pane
 #nop << showstatus - colors can be overridden
 #nop colors for on/off buffs (can be overrridden);
-#var boncol   {$cgreen};   #var boffcol    {$cgray}; 
-#var pkeycol  {$clblue};   #var pvalcol    {$cyellow};
-#var readycol {$cmagenta}; #var unreadycol {$cgray};
-#var flagcol  {$ccyan};
-#var recol    {$cwhite};
+#var boncol   {<aea>}; #var boffcol    {<bbb>}; 
+#var pkeycol  {<bbe>}; #var pvalcol    {<eea>};
+#var readycol {<eae>}; #var unreadycol {<bbb>};
+#var flagcol  {<add>}; #var recol      {<099>};
 
 #alias showpush { #nop <<;
   #var next {%1};

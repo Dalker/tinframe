@@ -7,7 +7,7 @@ NOCHAR="start_"
 LOGFILE="log.txt"
 CHATFILE="chat.txt"
 MAPFILE="map.txt"
-STATFILE="status.txt"
+STATFILE="stat.txt"
 MAINTT="main.tt"
 # size of status pane
 STATSIZE=10 

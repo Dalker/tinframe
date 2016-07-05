@@ -5,7 +5,7 @@ TFMAIN=$TFLIBDIR/mainlib.tt
 LOGFILE="logs/log.txt"
 CHATFILE="logs/chat.txt"
 MAPFILE="logs/map.txt"
-STATFILE="logs/status.txt"
+STATFILE="logs/stat.txt"
 MAINTT="main.tt"
 
 if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]

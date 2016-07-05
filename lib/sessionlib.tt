@@ -25,7 +25,6 @@
 #nop - caller-overrideable 'loginsequence' and 'postlogin'
 #nop - aliases 'memchar', 'memalso', 'recallchar' for use in 'onconnect' and 'onquit'
 #nop - caller-overrideable 'onconnect', 'prequit', 'onquit', 'ontimeout' are called when connecting / disconnecting
-#nop determine if this is multinframe
 #nop << auto-set $activesession, auto-save map, log connection/disconnection and call 'onconnect', 'onquit', ...;
 #alias fetchdate {#script thedate {date +"%Y.%m.%d - %H:%M"}}
 #event {SESSION CONNECTED}{
@@ -108,9 +107,11 @@
 };
 #nop >>
 #nop >>
-#nop << default versions of 'onconnect', 'onactive', 'prequit', 'quit' override, 'onquit', 'postquit', 'ontimeout', 'posttimeout';
+#nop << default versions of 'onconnect', 'postlogin', 'onactive', 'prequit', 'quit' override, 'onquit', 'postquit', 'ontimeout', 'posttimeout';
 #alias onconnect {#nop override this alias on mud tt file if necessary;}
-#alias onactive {setuppanes; #nop overridden by multilib if loaded}
+#alias postlogin { #nop override this alias on mud tt file if necessary};
+
+#alias onactive  {setuppanes; #nop overridden by multilib if loaded}
 
 #alias prequit {
   #nop stuff to be done before 'quit' command is sent to mud;
@@ -153,46 +154,45 @@
   postquit;
 }
 #nop >>
-#nop << 'loginas' alias and accesories: loginsequence, postlogin, showallchars, setuppanes
+
+#nop -- setting up tmux panes --
+#alias setuppanes { #nop << optional: give char as argument (otherwise $char is used);
+  #nop map file apparently shouldn't be symbolic link, or it lags.... :-(;
+  #var maplogfile {panes/map.txt};
+  #system {touch $maplogfile};
+
+  #nop determine if a char is defined, and link to it if yes;
+  #if {"%1" != ""} {#var char %1};
+  #if {&char} {#var logprefix $char} {#var logprefix start};
+  #var loglogfile  {panes/${logprefix}_log.txt};
+  #var chatlogfile {panes/${logprefix}_chat.txt};
+  #var statlogfile {panes/${logprefix}_stat.txt};
+  #system {
+    cd panes;
+    touch ${logprefix}_log.txt;  ln -sf ${logprefix}_log.txt  log.txt;
+    touch ${logprefix}_chat.txt; ln -sf ${logprefix}_chat.txt chat.txt;
+    touch ${logprefix}_stat.txt; ln -sf ${logprefix}_stat.txt stat.txt;
+  };
+  #nop if this is multinframe, other panes need to be set up as well;
+  #if {&multi} {
+    #system {cd panes; touch ${logprefix}_other.txt; ln -sf ${logprefix}_other.txt other.txt};
+    #if {$multi > 1} {
+      #system {cd panes; touch ${logprefix}_third.txt; ln -sf ${logprefix}_third.txt third.txt};
+    };
+  };
+}; #nop >>;
+setuppanes; #nop setuppanes when tinrame first invoked, and again when reloading lib;
+
+#nop -- aliases about logging in characters --
 #alias loginsequence { #nop << override this alias on mud tt file if necessary;
   $name;
   $pass;
-}; #nop >>;
-#alias postlogin { #nop << override this alias on mud tt file if necessary;
 }; #nop >>;
 #alias showallchars { #nop <<;
   #script {allcharnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt## | xargs};
   #echo {<040>possible chars: $allcharnames[1]<099>};
   #unvar allcharnames;
 }; #nop >>;
-#alias setuppanes { #nop << optional: give char as argument (otherwise $char is used);
-  #var maplogfile {panes/map.txt};
-  #if {"%1" != ""} {#var char %1};
-  #if {&char} {
-    #var loglogfile  {panes/${char}_log.txt};
-    #var chatlogfile {panes/${char}_chat.txt};
-    #var statlogfile {panes/${char}_status.txt};
-  #nop     touch ${char}_map.txt;  ln -sf ${char}_map.txt  map.txt; <--- symbolic link creates lag on map... :-(;
-    #system {
-      cd panes;
-      touch ${char}_log.txt;  ln -sf ${char}_log.txt  log.txt;
-      touch ${char}_chat.txt; ln -sf ${char}_chat.txt chat.txt;
-      echo "--== $char status ==--" > ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
-    };
-  } {
-    #var loglogfile  {panes/start_log.txt};
-    #var chatlogfile {panes/start_chat.txt};
-    #var statlogfile {panes/start_status.txt};
-    #system {echo "--== status ==--" > panes/start_status.txt};
-  };
-  #if {&multi} {
-    #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
-    #if {$multi > 1} {
-      #system {cd panes; touch ${char}_third.txt; ln -sf ${char}_third.txt third.txt};
-    };
-  };
-}; #nop >>;
-setuppanes; #nop setuppanes when tinrame first invoked, and again when reloading lib;
 #alias loginas { #nop << with $char as argument;
   #nop show available chars if no char or non-existant char asked for;
   #script {charnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt##};
@@ -215,7 +215,6 @@ setuppanes; #nop setuppanes when tinrame first invoked, and again when reloading
   };
   #unvar index;
 }; #nop >>;
-#nop >>
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28

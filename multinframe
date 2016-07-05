@@ -7,7 +7,7 @@ NOCHAR="start_"
 LOGFILE="log.txt"
 CHATFILE="chat.txt"
 MAPFILE="map.txt"
-STATFILE="status.txt"
+STATFILE="stat.txt"
 OTHERFILE="other.txt"
 MAINTT="main.tt"
 # size of status pane
@@ -40,14 +40,14 @@ else
     cd $TFMUDSDIR/$SESSION
      
     mkdir -p $PANEDIR
-    cd $PANEDIR
-    touch $NOCHAR$LOGFILE;   ln -sf $NOCHAR$LOGFILE   $LOGFILE
-    touch $NOCHAR$CHATFILE;  ln -sf $NOCHAR$CHATFILE  $CHATFILE
-    touch $NOCHAR$STATFILE;  ln -sf $NOCHAR$STATFILE  $STATFILE
-    touch $NOCHAR$OTHERFILE; ln -sf $NOCHAR$OTHERFILE $OTHERFILE
-#     touch $NOCHAR$MAPFILE;   ln -sf $NOCHAR$MAPFILE   $MAPFILE
-    touch $MAPFILE;
-    cd ..
+    # cd $PANEDIR
+    # touch $NOCHAR$LOGFILE;   ln -sf $NOCHAR$LOGFILE   $LOGFILE
+    # touch $NOCHAR$CHATFILE;  ln -sf $NOCHAR$CHATFILE  $CHATFILE
+    # touch $NOCHAR$STATFILE;  ln -sf $NOCHAR$STATFILE  $STATFILE
+    # touch $NOCHAR$OTHERFILE; ln -sf $NOCHAR$OTHERFILE $OTHERFILE
+#   #   touch $NOCHAR$MAPFILE;   ln -sf $NOCHAR$MAPFILE   $MAPFILE
+    # touch $MAPFILE;
+    # cd ..
 
     # setup window and start tintin
     # auto-detect user's actual shell and use the same in second tmux window
