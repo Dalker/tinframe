@@ -3,7 +3,6 @@ TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
 PANEDIR="panes/"
-NOCHAR="start_"
 LOGFILE="log.txt"
 CHATFILE="chat.txt"
 MAPFILE="map.txt"
@@ -35,14 +34,7 @@ else
      
     # act on shell first
     cd $TFMUDSDIR/$SESSION
-
     mkdir -p $PANEDIR
-    cd $PANEDIR
-    touch $NOCHAR$LOGFILE;  ln -sf $NOCHAR$LOGFILE  $LOGFILE
-    touch $NOCHAR$CHATFILE; ln -sf $NOCHAR$CHATFILE $CHATFILE
-    touch $NOCHAR$STATFILE; ln -sf $NOCHAR$STATFILE $STATFILE
-    touch $MAPFILE;
-    cd ..
      
     # setup window and start tintin
 #     tmux new-window    -t $SESSION:1 -k -n "tintin" "tintin -G -t main $MAINTT; tmux kill-session -t $SESSION"

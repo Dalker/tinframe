@@ -2,10 +2,11 @@
 TFMUDSDIR=${TFMUDSDIR:-./muds}
 TFLIBDIR=${TFLIBDIR:-../../lib}
 TFMAIN=$TFLIBDIR/mainlib.tt
-LOGFILE="logs/log.txt"
-CHATFILE="logs/chat.txt"
-MAPFILE="logs/map.txt"
-STATFILE="logs/stat.txt"
+PANEDIR="panes/"
+LOGFILE="${PANEDIR}log.txt"
+CHATFILE="${PANEDIR}chat.txt"
+MAPFILE="${PANEDIR}map.txt"
+STATFILE="${PANEDIR}stat.txt"
 MAINTT="main.tt"
 
 if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
@@ -31,11 +32,7 @@ else
      
     # act on shell first
     cd $TFMUDSDIR/$SESSION
-#     touch $LOGFILE
-#     touch $CHATFILE
-#     touch $MAPFILE
-#     touch $STATFILE
-    # note that if one of the streams does not exist, the corresponding pane will simply auto-close :-) <-- not true with -Fs1
+    mkdir -p $PANEDIR
      
     # setup window 1
     # auto-detect user's actual shell and use the same in second tmux window
