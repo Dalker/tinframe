@@ -123,6 +123,9 @@
   showprops; #nop display properties;
   showbuffs; #nop display buffs;
   showready; #nop display ready skills;
+  #gag {^  $};
+  #showme {  }; #nop vs. last line bug... :-(;
+  #ungag {^  $};
 };#nop >>;
 #nop >>;
 
