@@ -57,7 +57,7 @@
 #alias showpush { #nop <<;
   #var next {%1};
   #if {&tempc} {
-    statuslog {$templ$tempc$next$recol};
+    statlog {$templ$tempc$next$recol};
     #unvar tempc;
     #unvar templ;
   }; 
@@ -71,9 +71,9 @@
 #alias showflush { #nop <<;
   #if &templ {
     #if &tempc {
-      statuslog {$templ$tempc$recol};
+      statlog {$templ$tempc$recol};
     } {
-      statuslog {$templ$recol};
+      statlog {$templ$recol};
     };
     #unvar tempc;
     #unvar templ;
@@ -84,7 +84,7 @@
   #foreach {$statusflags[]} {flag} {
     #format flagline {%s$flagcol%u$recol } {$flagline} {$flag};
   };
-  statuslog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
+  statlog {$flagline}; #nop make sure this is not empty! (vs bug of capturing next from main pane);
   #unvar flagline;
 }#nop >>;
 #alias showprops { #nop <<;
@@ -119,7 +119,7 @@
 }#nop >>;
 #alias showstatus { #nop overrideable to change order <<;
   #nop first clear the status pane;
-  #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1}; statuslog { }};
+  #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1}; statlog { }};
   showflags; #nop display status flags line;
   showprops; #nop display properties;
   showbuffs; #nop display buffs;
@@ -372,4 +372,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-07-01
+#nop modif  date: 2016-07-05

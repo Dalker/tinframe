@@ -53,15 +53,16 @@
 
 #var maplogfile {panes/map.txt};
 #alias setstartlogs {
-  #var loglogfile    {panes/start_log.txt};
-  #var chatlogfile   {panes/start_chat.txt};
-  #var statuslogfile {panes/start_status.txt};
+  #var loglogfile  {panes/start_log.txt};
+  #var chatlogfile {panes/start_chat.txt};
+  #var statlogfile {panes/start_status.txt};
+  #system {echo "--== status ==--" > panes/start_status.txt};
 }
 #if {&char} {#nop;} {setstartlogs}
 
-#alias loglog    {#line log $loglogfile    %0};
-#alias chatlog   {#line log $chatlogfile   %0};
-#alias statuslog {#line log $statuslogfile %0};
+#alias loglog  {#line log $loglogfile    %0};
+#alias chatlog {#line log $chatlogfile   %0};
+#alias statlog {#line log $statlogfile %0};
 #alias maplog    {#line log $maplogfile    %0};
 
 #nop Based on a TinTin++ website example: 'log [on|off|filename]' to log all into dated file - modified to allow choice of named file instead
@@ -105,4 +106,4 @@
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-07-03
+#nop modif  date: 2016-07-05

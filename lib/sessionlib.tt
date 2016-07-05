@@ -168,9 +168,9 @@
 #alias setuppanes { #nop << optional: give char as argument (otherwise $char is used);
   #if {"%1" != ""} {#var char %1};
   #if {&char} {
-    #var loglogfile    {panes/${char}_log.txt};
-    #var chatlogfile   {panes/${char}_chat.txt};
-    #var statuslogfile {panes/${char}_status.txt};
+    #var loglogfile  {panes/${char}_log.txt};
+    #var chatlogfile {panes/${char}_chat.txt};
+    #var statlogfile {panes/${char}_status.txt};
   #nop     touch ${char}_map.txt;  ln -sf ${char}_map.txt  map.txt; <--- symbolic link creates lag on map... :-(;
     #system {
       cd panes;
