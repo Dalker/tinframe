@@ -32,41 +32,14 @@
     #echo {and 'log <fname>' starts logging everything into an arbitrarily named log file (stop with 'log off')};
 }
 #nop >>;
-#nop << console colors, for use with standard logs;
-#var cblack   {[38;5;0m};
-#var cred     {[38;5;1m};
-#var cgreen   {[38;5;2m};
-#var cyellow  {[38;5;3m};
-#var cblue    {[38;5;4m};
-#var cmagenta {[38;5;5m};
-#var ccyan    {[38;5;6m};
-#var cwhite   {[38;5;7m};
-#var cgray    {[38;5;8m};
-#var clred    {[38;5;9m};
-#var clgreen  {[38;5;10m};
-#var clyellow {[38;5;11m};
-#var clblue   {[38;5;12m};
-#var clmagenta {[38;5;13m};
-#var clcyan   {[38;5;14m};
-#var clwhite  {[38;5;15m};
-#nop >>
 
-#var maplogfile {panes/map.txt};
-#alias setstartlogs {
-  #var loglogfile  {panes/start_log.txt};
-  #var chatlogfile {panes/start_chat.txt};
-  #var statlogfile {panes/start_status.txt};
-  #system {echo "--== status ==--" > panes/start_status.txt};
-}
-#if {&char} {#nop;} {setstartlogs}
-
-#alias loglog  {#line log $loglogfile    %0};
-#alias chatlog {#line log $chatlogfile   %0};
+#nop << "logs" for panes - log files set up in sessionlib
+#alias loglog  {#line log $loglogfile  %0};
+#alias chatlog {#line log $chatlogfile %0};
 #alias statlog {#line log $statlogfile %0};
-#alias maplog    {#line log $maplogfile    %0};
-
-#nop Based on a TinTin++ website example: 'log [on|off|filename]' to log all into dated file - modified to allow choice of named file instead
-#nop << log [on|off|filename];
+#alias maplog  {#line log $maplogfile  %0};
+#nop >>
+#nop << log [on|off|filename] (all log into dated file (default) or named file - expanded from a TinTin++ website example);
 #alias {log} {
   #if {"%0" == "on"} {
     #if {"$logging" != "on"} {
@@ -103,6 +76,26 @@
 }
 #nop >>
 
+#nop { -- turns out the following is not needed, as <abc> codes do get translated correctly --;
+#nop << console colors, for use with standard logs;
+#var cblack   {[38;5;0m};
+#var cred     {[38;5;1m};
+#var cgreen   {[38;5;2m};
+#var cyellow  {[38;5;3m};
+#var cblue    {[38;5;4m};
+#var cmagenta {[38;5;5m};
+#var ccyan    {[38;5;6m};
+#var cwhite   {[38;5;7m};
+#var cgray    {[38;5;8m};
+#var clred    {[38;5;9m};
+#var clgreen  {[38;5;10m};
+#var clyellow {[38;5;11m};
+#var clblue   {[38;5;12m};
+#var clmagenta {[38;5;13m};
+#var clcyan   {[38;5;14m};
+#var clwhite  {[38;5;15m};
+#nop >>
+}
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28

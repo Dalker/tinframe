@@ -166,6 +166,7 @@
   #unvar allcharnames;
 }; #nop >>;
 #alias setuppanes { #nop << optional: give char as argument (otherwise $char is used);
+  #var maplogfile {panes/map.txt};
   #if {"%1" != ""} {#var char %1};
   #if {&char} {
     #var loglogfile  {panes/${char}_log.txt};
@@ -179,7 +180,10 @@
       echo "--== $char status ==--" > ${char}_status.txt; ln -sf ${char}_status.txt status.txt;
     };
   } {
-    setstartlogs;
+    #var loglogfile  {panes/start_log.txt};
+    #var chatlogfile {panes/start_chat.txt};
+    #var statlogfile {panes/start_status.txt};
+    #system {echo "--== status ==--" > panes/start_status.txt};
   };
   #if {&multi} {
     #system {cd panes; touch ${char}_other.txt; ln -sf ${char}_other.txt other.txt};
@@ -188,6 +192,7 @@
     };
   };
 }; #nop >>;
+setuppanes; #nop setuppanes when tinrame first invoked, and again when reloading lib;
 #alias loginas { #nop << with $char as argument;
   #nop show available chars if no char or non-existant char asked for;
   #script {charnames} {ls chars/*.tt | sed -e s#chars/## -e s#.tt##};
