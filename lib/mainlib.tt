@@ -127,7 +127,15 @@ libinclude loglib;
 libinclude maplib;
 libinclude sessionlib;
 libinclude statuslib;
-#echo {included tinframe classes: loglib maplib sessionlib statuslib};
+#nop also include multilib if necessary, else unvar $multi;
+#script temp {echo $MULTI}; #var multi $temp[1]; #unvar temp;
+#if {$multi > 0} {
+  libinclude multilib;
+  #echo {included tinframe classes: loglib maplib sessionlib statuslib multilib};
+} {
+  #unvar multi;
+  #echo {included tinframe classes: loglib maplib sessionlib statuslib};
+};
 #nop >>
 #nop << (re)load local include classes as well as char and map classes, if any;
 #script {localincludes} {cd include; ls *.tt | sed -e "s/.tt$//"};
@@ -169,4 +177,4 @@ libinclude statuslib;
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2014-02-12
-#nop modif  date: 2016-06-18
+#nop modif  date: 2016-07-05
