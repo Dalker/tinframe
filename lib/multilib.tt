@@ -15,20 +15,20 @@
 }; #nop >>
 
 #nop -- use gts to index existing sessions --
-#alias newsession { #nop << newsession <name> - add to session index;
+#alias gtsnewsession { #nop << gtsnewsession <name> - add to session index;
   #list sessions add %1;
   #list sessions size maxsessionindex;
-  activatesession %1;
+  gtsactivatesession %1;
 #nop   #var  sessionindex  maxsessionindex;
 }; #nop >>
-#alias killsession { #nop << called by session timeout and disconnect events;
+#alias gtskillsession { #nop << called by session timeout and disconnect events;
   #list sessions find %1 killsessionindex;
   #if {$killsessionindex > 0} {
     #list sessions delete $killsessionindex;
   };
   #unvar killsessionindex;
 }; #nop >>
-#alias gotoprevsession { #nop <<;
+#alias gtsprevsession { #nop <<;
   #if {$sessionindex == 1} {
     #var sessionindex $maxsessionindex;
   } {
@@ -38,7 +38,7 @@
   $thecommand;
   #unvar thecommand;
 }; #nop >>
-#alias gotonextsession { #nop <<;
+#alias gtsnextsession { #nop <<;
   #if {$sessionindex == $maxsessionindex} {
     #var sessionindex 1;
   } {
@@ -48,7 +48,7 @@
   $thecommand;
   #unvar thecommand;
 }; #nop >>
-#alias activatesession { #nop <<;
+#alias gtsactivatesession { #nop <<;
   #nop put all sessions into the background (new active one will be de-backgrounded later);
   #loop 1 $maxsessionindex i {#format thecommand {#%s #var inthebackground yes}  {$sessions[$i]}; $thecommand};
 
@@ -57,7 +57,7 @@
 
   #nop look for new active session to set up;
   #list sessions find %1 sessionindex;
-  #if {$sessionindex == 0} {#echo {!! activatesession: <red>trying to activate non-indexed session %1 !!<099>}};
+  #if {$sessionindex == 0} {#echo {!! gtsactivatesession: <red>trying to activate non-indexed session %1 !!<099>}};
   #else {
     #nop active session is not in the background anymore;
     #format thecommand {#%s #unvar inthebackground}  {$sessions[$sessionindex]}; $thecommand;
@@ -82,12 +82,12 @@
     #unvar thecommand;
   };
 }; #nop >>
-#macro {\eOP} {#gts gotoprevsession}; #nop <F1>;
-#macro {\eOQ} {#gts gotonextsession}; #nop <F2>;
+#macro {\eOP} {#gts gtsprevsession}; #nop <F1>;
+#macro {\eOQ} {#gts gtsnextsession}; #nop <F2>;
 
 #nop -- start a new session, optionally followed by login --
 #alias startsession { #nop << startsession <session> [char];
-  #gts newsession %1; 
+  #gts gtsnewsession %1; 
   #ses %1 $mudhost $mudport;
   #var sessionname %1;
   #if {"%2" != ""} {
@@ -110,7 +110,7 @@
   };
   #nop Otherwise we're in a true session;
   #else {
-    #gts activatesession $activesession;
+    #gts gtsactivatesession $activesession;
     showstatus;
     #if {&currentmap} {redrawmap};
     #if {&name} {

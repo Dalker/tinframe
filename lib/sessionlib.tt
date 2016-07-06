@@ -54,7 +54,7 @@
    #echo {map cleanly closed on disconnection.};
  };
  postquit;
- #if {$multi > 0} {#gts killsession $sessionname};
+ #if {$multi > 0} {#gts gtskillsession $sessionname};
  #nop note that *after* this, session data is definitely lost;
 }
 
