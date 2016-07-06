@@ -37,7 +37,7 @@
 #event {SESSION ACTIVATED} {
   #var activesession %0;
   #echo {*** session $activesession activated ***};
-  onactive;
+  onactive; #nop important for multilib;
 } 
 #event {SESSION DEACTIVATED} {
   #echo {*** session $activesession deactivated ***};
@@ -174,9 +174,9 @@
     touch ${logprefix}_stat.txt; ln -sf ${logprefix}_stat.txt stat.txt;
   };
   #if {&char} {showstatus};
-  #nop if this is multinframe, other panes need to be set up as well;
+  #nop if this is multinframe, alt panes need to be set up as well;
   #if {&multi} {
-    #system {cd panes; touch ${logprefix}_other.txt; ln -sf ${logprefix}_other.txt other.txt};
+    #system {cd panes; touch ${logprefix}_alt.txt; ln -sf ${logprefix}_alt.txt alt.txt};
     #if {$multi > 1} {
       #system {cd panes; touch ${logprefix}_third.txt; ln -sf ${logprefix}_third.txt third.txt};
     };
