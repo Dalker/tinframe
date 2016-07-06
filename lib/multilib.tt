@@ -1,0 +1,141 @@
+#nop ------------------------
+#nop -= mutlichar handling =-
+#nop ------------------------
+
+#nop -- overrideable variable --
+#var logindelay .5; #nop modifiable delay to send login sequence after connecting to mud
+
+#nop << initialize persistent gts variables if no session exists at all;
+#if {&sessionindex} {#nop;} {
+  #class temp open;
+  #list  sessions clear;
+  #var   sessionindex    0;
+  #var   maxsessionindex 0;
+  #class sessionlib open;
+}; #nop >>
+
+#nop -- use gts to index existing sessions --
+#alias newsession { #nop << newsession <name> - add to session index;
+  #list sessions add %1;
+  #list sessions size maxsessionindex;
+  activatesession %1;
+#nop   #var  sessionindex  maxsessionindex;
+}; #nop >>
+#alias killsession { #nop << called by session timeout and disconnect events;
+  #list sessions find %1 killsessionindex;
+  #if {$killsessionindex > 0} {
+    #list sessions delete $killsessionindex;
+  };
+  #unvar killsessionindex;
+}; #nop >>
+#alias gotoprevsession { #nop <<;
+  #if {$sessionindex == 1} {
+    #var sessionindex $maxsessionindex;
+  } {
+    #math sessionindex {$sessionindex - 1};
+  };
+  #format thecommand {#%s} {$sessions[$sessionindex]};
+  $thecommand;
+  #unvar thecommand;
+}; #nop >>
+#alias gotonextsession { #nop <<;
+  #if {$sessionindex == $maxsessionindex} {
+    #var sessionindex 1;
+  } {
+    #math sessionindex {$sessionindex + 1};
+  };
+  #format thecommand {#%s} {$sessions[$sessionindex]};
+  $thecommand;
+  #unvar thecommand;
+}; #nop >>
+#alias activatesession { #nop <<;
+  #nop put all sessions into the background (new active one will be de-backgrounded later);
+  #loop 1 $maxsessionindex i {#format thecommand {#%s #var inthebackground yes}  {$sessions[$i]}; $thecommand};
+
+  #nop stop any previous alt logging;
+  #if {$altsessionindex > 0} {#format thecommand {#%s #log off} {$sessions[$altindex]}; $thecommand};
+
+  #nop look for new active session to set up;
+  #list sessions find %1 sessionindex;
+  #if {$sessionindex == 0} {#echo {!! activatesession: <red>trying to activate non-indexed session %1 !!<099>}};
+  #else {
+    #nop active session is not in the background anymore;
+    #format thecommand {#%s #unvar inthebackground}  {$sessions[$sessionindex]}; $thecommand;
+
+    #nop choose a possible 'alt' session to log into 'alt' pane;
+    #var altsessionindex 0;
+    #if {$sessionindex != 1} { #nop there is a previous session, consider it as the 'alt' session;
+      #math altsessionindex {$sessionindex - 1};
+    };
+    #elseif {$sessionindex < $maxsessionindex} { #nop there is a next session, consider it as the 'alt' session;
+      #math altsessionindex {$sessionindex + 1};
+    };
+    #if {$altsessionindex > 0} {
+      #format thecommand {#var alt #%s}       {$sessions[$altsessionindex]}; $thecommand;
+      #format thecommand {#%s #var alt $alt}  {$sessions[$sessionindex]};    $thecommand;
+      $alt #var inthebackground yes;
+      $alt #log append panes/alt.txt;
+    } {
+      #unvar alt;
+      #format thecommand {#%s #unvar alt}     {$sessions[$sessionindex]};    $thecommand;
+    };
+    #unvar thecommand;
+  };
+}; #nop >>
+#macro {\eOP} {#gts gotoprevsession}; #nop <F1>;
+#macro {\eOQ} {#gts gotonextsession}; #nop <F2>;
+
+#nop -- start a new session, optionally followed by login --
+#alias startsession { #nop << startsession <session> [char];
+  #gts newsession %1; 
+  #ses %1 $mudhost $mudport;
+  #var sessionname %1;
+  #if {"%2" != ""} {
+    #var char %2;
+    #delay {$logindelay} {loginas %2; onactive};
+  };
+}; #nop >>;
+#alias ses { #nop << shortcut for startsession with name being 3 firsts characters of $char;
+  #format tempsesname {%.3s} {%1};
+  startsession $tempsesname %1;
+  #unvar tempsesname;
+}; #nop >>
+
+#nop -- activate a session --
+#alias onactive { #nop << standard override for multis;
+  setuppanes;
+  #if {"$activesession" == "gts"} {
+    #echo {<bce>start multisession with: <cbf>startsession <name> [char]<099>};
+    showallchars;
+  };
+  #nop Otherwise we're in a true session;
+  #else {
+    #gts activatesession $activesession;
+    showstatus;
+    #if {&currentmap} {redrawmap};
+    #if {&name} {
+      #if {&alt} {
+        $alt altname $name;
+        $alt #echo {-- alt is $alt --};
+        #echo {-- active session is #$activesession with character $name, alt is $alt --};
+      } {
+        #echo {-- active session is #$activesession with character $name --};
+      };
+    };
+  };
+};#nop >>;
+
+#nop -- show message if gts (never sessioned, or quit session and detected gts) --
+#function sessionisgts {#if {&activesession && "$activesession" != "gts"} {#return 0} {#return 1}}; #nop <<;
+#if {@sessionisgts{}} { 
+  #delay .2 {
+    #echo {<bce>start session with: <cbf>ses <char><099> or <cbf>startsession <name> [char]<099>};
+    showallchars;
+  };
+};
+#nop >>;
+
+#nop------------------------
+#nop CopyLeft by dalker
+#nop create date: 2016-07-05
+#nop modif  date: 2016-07-06

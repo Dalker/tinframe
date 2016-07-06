@@ -54,6 +54,7 @@
    #echo {map cleanly closed on disconnection.};
  };
  postquit;
+ #if {$multi > 0} {#gts killsession $sessionname};
  #nop note that *after* this, session data is definitely lost;
 }
 
@@ -68,6 +69,7 @@
    #echo {map cleanly closed on timeout.};
  };
  posttimeout; #nop normally calls 'postquit', but can be overridden;
+ #if {$multi > 0} {#gts killsession $sessionname};
  #nop note that *after* this, session data is definitely lost;
 }
 #nop >>
@@ -108,8 +110,8 @@
 #nop >>
 #nop >>
 #nop << default versions of 'onconnect', 'postlogin', 'onactive', 'prequit', 'quit' override, 'onquit', 'postquit', 'ontimeout', 'posttimeout';
-#alias onconnect {#nop override this alias on mud tt file if necessary;}
-#alias postlogin { #nop override this alias on mud tt file if necessary};
+#alias onconnect {#nop override this alias on mud tt file if necessary}
+#alias postlogin {#nop override this alias on mud tt file if necessary};
 
 #alias onactive  {setuppanes; #nop overridden by multilib if loaded}
 
@@ -121,8 +123,8 @@
 #var prequitdelay {0.2}
 #alias quit {
   #nop delay actual quit in case 'prequit' script needs to do some stuff before;
-  #delay $prequitdelay {#send quit};
   prequit;
+  #delay $prequitdelay {#send quit};
 };
 
 #alias onquit {
