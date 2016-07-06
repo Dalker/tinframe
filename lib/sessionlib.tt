@@ -173,6 +173,7 @@
     touch ${logprefix}_chat.txt; ln -sf ${logprefix}_chat.txt chat.txt;
     touch ${logprefix}_stat.txt; ln -sf ${logprefix}_stat.txt stat.txt;
   };
+  #if {&char} {showstatus};
   #nop if this is multinframe, other panes need to be set up as well;
   #if {&multi} {
     #system {cd panes; touch ${logprefix}_other.txt; ln -sf ${logprefix}_other.txt other.txt};
@@ -218,4 +219,4 @@ setuppanes; #nop setuppanes when tinrame first invoked, and again when reloading
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-07-04
+#nop modif  date: 2016-07-06
