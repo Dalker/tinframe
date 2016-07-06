@@ -45,6 +45,33 @@
 #class statuslib open;
 #nop >>;
 
+#nop formatting a number with a power of ten prefix (k or M)
+#function prefixnum { #nop << call with {number;[prefixcolor|space]};
+  #if { %1 < 1000} {
+    #math thenum { %1 };
+    #var thepre {};
+  }; #elseif { %1 < 10000} {
+    #math thenum { 1.11 * %1 / 1110 };
+    #var thepre k;
+  }; #elseif { %1 < 100000} {
+    #math thenum { 1.1  * %1 / 1100 };
+    #var thepre k;
+  }; #elseif { %1 < 1000000} {
+    #math thenum { 1    * %1 / 1000 };
+    #var thepre k;
+  }; #elseif { %1 < 10000000} {
+    #math thenum { 1.11 * %1 / 1110000 };
+    #var thepre M;
+  }; #elseif { %1 < 100000000} {
+    #math thenum { 1.1  * %1 / 1100000 };
+    #var thepre M;
+  }; #else {
+    #math thenum { 1    * %1 / 1000000 };
+    #var thepre M;
+  };
+  #return {$thenum%2$thepre};
+}; #nop >>;
+
 #nop displaying in status pane
 #nop << showstatus - colors can be overridden
 #nop colors for on/off buffs (can be overrridden);
@@ -374,4 +401,4 @@
 #nop ------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-04-14
-#nop modif  date: 2016-07-05
+#nop modif  date: 2016-07-06
