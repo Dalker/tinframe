@@ -32,7 +32,7 @@
 #nop       (can be used on a per-mud basis combined with autobuff/custombuff/stopbuff)
 #nop << make sure the hashes exist - and make sure they don't get killed when reloading class;
 #nop these lists must live in 'temp', so that they don't get erased when reloading the libs;
-#class temp open;
+#class tempstat open;
 #if {&statusflags} {#nop;} {#var statusflags {}};
 #if {&dispbuffs}   {#nop;} {#var dispbuffs   {}};
 #if {&activebuffs} {#nop;} {#var activebuffs {}};
