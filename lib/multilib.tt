@@ -8,10 +8,12 @@
 
 #nop -- initialize persistent gts variables if no real session exists yet --
 #if {@sessionisgts} {#if {&sessionindex} {#nop;} { #nop <<;
-  #class temp open;
+  #class tempmulti open;
   #list  sessions  clear;
   #list  charnames clear;
   #var   sessionindex    0;
+  #var   altsessionindex 0;
+  #var   bltsessionindex 0;
   #var   maxsessionindex 0;
   #class sessionlib open;
 }}; #nop >>
@@ -66,6 +68,7 @@
 
   #nop stop any previous alt logging;
   #if {$altsessionindex > 0} {#format thecommand {#%s #log off} {$sessions[$altsessionindex]}; $thecommand};
+  #if {$bltsessionindex > 0} {#format thecommand {#%s #log off} {$sessions[$bltsessionindex]}; $thecommand};
 
   #nop look for new active session to set up as $main;
   #list sessions find $activesession sessionindex;
@@ -79,18 +82,35 @@
     #if {$sessionindex != 1} { #nop there is a previous session, consider it as the 'alt' session;
       #math altsessionindex {$sessionindex - 1};
     };
-    #elseif {$sessionindex < $maxsessionindex} { #nop there is a next session, consider it as the 'alt' session;
-      #math altsessionindex {$sessionindex + 1};
+    #elseif {$maxsessionindex > 1} { #nop there is a different session, so last one is considered previous from first;
+      #var altsessionindex $maxsessionindex;
     };
     #if {$altsessionindex > 0} {
-      #format thecommand {#var alt #%s}       {$sessions[$altsessionindex]}; $thecommand;
+      #format thecommand {#var alt #%s} {$sessions[$altsessionindex]}; $thecommand;
       $main #var alt $alt;
-      $alt  #var inthebackground yes;
       $alt  #log append panes/alt.txt;
     } {
       #unvar alt;
       $main #unvar alt;
     };
+
+    #nop choose a possible 'blt' session to log into 'blt' pane, or deactive $blt in #gts, $main and $alt;
+    #var bltsessionindex 0;
+    #if {$sessionindex < $maxsessionindex} { #nop there is a next session, consider it as the 'blt' session;
+      #math bltsessionindex {$sessionindex + 1};
+    };
+    #elseif {$maxsessionindex > 2} { #nop there is a different session, so first one is considered next from last;
+      #var bltsessionindex 1;
+    };
+    #if {$bltsessionindex > 0} {
+      #format thecommand {#var blt #%s} {$sessions[$bltsessionindex]}; $thecommand;
+      $main #var blt $blt;
+      $blt  #log append panes/blt.txt;
+    } {
+      #unvar blt;
+      $main #unvar blt;
+    };
+
     #unvar thecommand;
   };
 }; #nop >>
@@ -158,4 +178,4 @@
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-07-05
-#nop modif  date: 2016-07-06
+#nop modif  date: 2016-07-07

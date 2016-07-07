@@ -1,0 +1,64 @@
+#!/bin/bash
+source "${BASH_SOURCE%/*}"/tinfiles
+# size of status pane
+STATSIZE=10 
+# tell TinTin++ we're in 3tinframe (i.e. there can be 2 extra characters: 'alt' and 'blt')
+export MULTI=2
+
+if [[ -z "$1" || ! -d $TFMUDSDIR/$1 ]]
+then
+  echo "Usage: $(basename $0) <name>, where <name> is one of:"
+  cd $TFMUDSDIR
+  ls | sed -e "s/blank//" -e "s/past//" -e "s/lib//" | xargs echo
+else
+  # name of tmux session
+  export SESSION="$1"
+   
+  # if session already running, attach it.
+  tmux has-session -t $SESSION 2> /dev/null
+  if [ $? -eq 0 ]; then
+    echo "Session $SESSION already exists. Attaching."
+    sleep 1
+    tmux attach -t $SESSION
+  else
+    # else create it, and detach it to work on it a bit
+    tmux new-session -d -s $SESSION
+    # populate the session using corresponding script
+    echo populating session for $TFMUDSDIR/$SESSION
+     
+    # act on shell first
+    cd $TFMUDSDIR/$SESSION
+    mkdir -p $PANEDIR
+
+    # setup window and start tintin
+    # auto-detect user's actual shell and use the same in second tmux window
+    tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
+    tmux new-window    -t $SESSION:1 -k -n "tintin" "$SHELL"
+    tmux new-window    -t $SESSION:3 -k -n "$(basename $SHELL)"
+    tmux select-window -t $SESSION:1
+    
+    # setup panes and start chat, log, map and status streams
+    # first split: left 1.1 | right 1.2 -- secondary column has smaller width than tintin window
+    tmux split-window -t $SESSION:1   -h -l 60 "tail -Fs1 $PANEDIR$LOGFILE"
+    # split left between up 1.3-4 / down 1.1 -- other chars' panes should have same width as tintin pane
+    tmux split-window -t $SESSION:1.1 -b -v -l 6 "tail -Fs0.5 $PANEDIR$ALTFILE"
+    tmux split-window -t $SESSION:1.1 -b -v -l 6 "tail -Fs0.5 $PANEDIR$BLTFILE"
+    # split right between up 1.2 / down 1.5 -- map on secondary column, fixed width for map
+    tmux split-window -t $SESSION:1.2 -v -l 22 "tail -Fs0.5 $PANEDIR$MAPFILE"
+    # split right between up 1.2 / down 1.6 -- chat on secondary column
+    tmux split-window -t $SESSION:1.2 -v -l 6 "tail -Fs0.5 $PANEDIR$CHATFILE"
+    # split right between up 1.6 / down 1.2 -- last split *if* status file is used
+    tmux split-window -t $SESSION:1.2 -b -v -l $STATSIZE "tail -Fs1 $PANEDIR$STATFILE"
+
+    # actually start TinTin++
+    tmux send-keys -t $SESSION:1.1 "tintin -G -e \"#var libdir $TFLIBDIR\" -e \"#var tinframe $TFMAIN\" -t main $MAINTT && tmux kill-session" Enter
+    # select main pane
+    tmux select-pane  -t $SESSION:1.1
+    # re-attach session
+    exec tmux attach -t $SESSION
+  fi
+fi
+#------------------------
+# CopyLeft by dalker
+# create date: 2016-07-02
+# modif  date: 2016-07-07
