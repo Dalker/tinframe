@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# location of TinFrame muds and lib dirs as well as main lib file
+export TFMUDSDIR=${TFMUDSDIR:-./muds}
+export TFLIBDIR=${TFLIBDIR:-../../lib}
+export TFMAIN=$TFLIBDIR/mainlib.tt
+
+# location of panes files and their names
+export PANEDIR="panes/"
+export LOGFILE="log.txt"
+export CHATFILE="chat.txt"
+export MAPFILE="map.txt"
+export STATFILE="stat.txt"
+export ALTFILE="alt.txt"
+export MAINTT="main.tt"
+
+#------------------------
+# CopyLeft by dalker
+# create date: 2016-07-07
+# modif  date: 2016-07-07

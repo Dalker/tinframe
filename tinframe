@@ -1,13 +1,6 @@
 #!/bin/bash
-TFMUDSDIR=${TFMUDSDIR:-./muds}
-TFLIBDIR=${TFLIBDIR:-../../lib}
-TFMAIN=$TFLIBDIR/mainlib.tt
-PANEDIR="panes/"
-LOGFILE="log.txt"
-CHATFILE="chat.txt"
-MAPFILE="map.txt"
-STATFILE="stat.txt"
-MAINTT="main.tt"
+source "${BASH_SOURCE%/*}"/tinfiles
+
 # size of status pane
 STATSIZE=10 
 
@@ -68,4 +61,4 @@ fi
 #------------------------
 # CopyLeft by dalker
 # create date: 2014-02-09
-# modif  date: 2016-06-16
+# modif  date: 2016-07-07
