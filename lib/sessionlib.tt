@@ -90,11 +90,12 @@
   #else {#line log {$memfile} {#echo no map information saved for %1}};
 
   #nop save status information, if any;
-  #foreach $dispbuffs[]   buff {#line log {$memfile} {#var dispbuffs[$buff]   {saved}}};
-  #foreach $activebuffs[] buff {#line log {$memfile} {#var activebuffs[$buff] {saved}}};
-  #foreach $autobuffs[]   buff {#line log {$memfile} {#var autobuffs[$buff]   {$autobuffs[$buff]}}};
-  #foreach $statusflags[] flag {#line log {$memfile} {#var statusflags[$flag] {$statusflags[$flag]}}};
-  #foreach $statusprops[] key  {#line log {$memfile} {#var statusprops[$key]  {$statusprops[$key]}}};
+  #foreach $statusflags[] flag  {#line log {$memfile} {#var statusflags[$flag] {saved};
+  #foreach $dispready[]   skill {#line log {$memfile} {#var dispready[$skill]  {saved}}};
+  #foreach $isready[]     skill {#line log {$memfile} {#var isready[$skill]    {saved}}};
+  #foreach $dispbuffs[]   buff  {#line log {$memfile} {#var dispbuffs[$buff]   {saved}}};
+  #foreach $activebuffs[] buff  {#line log {$memfile} {#var activebuffs[$buff] {saved}}};
+  #foreach $statusprops[] key   {#line log {$memfile} {#var statusprops[$key]  {$statusprops[$key]}}};
 };#nop >>
 #alias memalso { #nop <<;
   #if &char {
@@ -221,4 +222,4 @@ setuppanes; #nop setuppanes when tinrame first invoked, and again when reloading
 #nop------------------------
 #nop CopyLeft by dalker
 #nop create date: 2016-05-28
-#nop modif  date: 2016-07-06
+#nop modif  date: 2016-07-07
