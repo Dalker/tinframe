@@ -90,7 +90,7 @@
   #else {#line log {$memfile} {#echo no map information saved for %1}};
 
   #nop save status information, if any;
-  #foreach $statusflags[] flag  {#line log {$memfile} {#var statusflags[$flag] {saved};
+  #foreach $statusflags[] flag  {#line log {$memfile} {#var statusflags[$flag] {saved}}};
   #foreach $dispready[]   skill {#line log {$memfile} {#var dispready[$skill]  {saved}}};
   #foreach $isready[]     skill {#line log {$memfile} {#var isready[$skill]    {saved}}};
   #foreach $dispbuffs[]   buff  {#line log {$memfile} {#var dispbuffs[$buff]   {saved}}};
