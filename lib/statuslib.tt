@@ -79,11 +79,10 @@
 #var pkeycol  {<bbe>}; #var pvalcol    {<eea>};
 #var readycol {<eae>}; #var unreadycol {<bbb>};
 #var flagcol  {<add>}; #var recol      {<099>};
-
 #alias showpush { #nop <<;
   #var next {%1};
   #if {&tempc} {
-    statlog {$templ$tempc$next$recol};
+    statlog {$templ$tempc$next$recol}; #math thecount { $thecount + 1};
     #unvar tempc;
     #unvar templ;
   }; 
@@ -97,9 +96,9 @@
 #alias showflush { #nop <<;
   #if &templ {
     #if &tempc {
-      statlog {$templ$tempc$recol};
+      statlog {$templ$tempc$recol}; #math thecount { $thecount + 1};
     } {
-      statlog {$templ$recol};
+      statlog {$templ$recol}; #math thecount { $thecount + 1};
     };
     #unvar tempc;
     #unvar templ;
@@ -144,15 +143,25 @@
   showflush;
 }#nop >>;
 #alias showstatus { #nop overrideable to change order <<;
-  #nop first clear the status pane;
-  #var thecount 0; #while { $thecount < 7 } {#math thecount { $thecount + 1}; statlog { }};
-  showflags; #nop display status flags line;
-  showprops; #nop display properties;
-  showbuffs; #nop display buffs;
-  showready; #nop display ready skills;
-  #gag {^  $};
-  #showme {  }; #nop vs. last line bug... :-(;
-  #ungag {^  $};
+  #nop avoid re-showing while still printing pane (because of tail -F lag);
+  #if {&drawingstatus} {#nop;} {
+    #var drawingstatus yes;
+    #nop first clear the status pane;
+    #var thecount 0; #while {$thecount < 7} {#math thecount { $thecount + 1}; statlog { }};
+    #nop then show the different types of status, counting the lines used;
+    #var thecount 0; 
+    showflags; #nop display status flags line;
+    showprops; #nop display properties;
+    showbuffs; #nop display buffs;
+    showready; #nop display ready skills;
+    #nop finally, fill in some lines to make it pretty;
+    #while {$thecount<7} {#math thecount { $thecount + 1}; statlog { }};
+#nop     #gag {^  $};
+#nop     #showme {  }; #nop vs. last line bug... :-(;
+#nop     #ungag {^  $};
+    #nop and make sure this has time to update on tail -F pane;
+    #delay 0.2 {#unvar drawingstatus};
+  };
 };#nop >>;
 #nop >>;
 
