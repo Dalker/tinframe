@@ -15,7 +15,7 @@
   #var   altsessionindex 0;
   #var   bltsessionindex 0;
   #var   maxsessionindex 0;
-  #class sessionlib open;
+  #class multilib open;
 }}; #nop >>
 
 #nop -- use gts to index existing sessions --
@@ -23,18 +23,21 @@
   #list sessions add %1;
   #list sessions size maxsessionindex;
   gtsactivatesession %1;
-#nop   #var  sessionindex  maxsessionindex;
 }; #nop >>
 #alias gtscharname { #nop << gtscharname <session> <charname>;
   #var charnames[%1] %2;
 }; #nop >>
 #alias gtskillsession { #nop << called by session timeout and disconnect events;
-  #list sessions find %1 killsessionindex;
-  #if {$killsessionindex > 0} {
-    #list sessions  delete $killsessionindex;
-    #list charnames delete $killsessionindex;
+  #var killedsession %1;
+  #delay 2 { #nop leave time for gtsactivatesession to act first;
+    #list sessions find $killedsession killsessionindex;
+    #if {$killsessionindex > 0} {
+      #list sessions  delete $killsessionindex;
+      #list charnames delete $killsessionindex;
+    };
+    #list sessions size maxsessionindex;
+    #unvar killsessionindex;
   };
-  #unvar killsessionindex;
 }; #nop >>
 #alias gtsprevsession { #nop <<;
   #if {$sessionindex == 1} {
@@ -155,11 +158,19 @@
     #if {&currentmap} {redrawmap};
     #if {&name} {
       #gts gtscharname {$activesession} {$name};
-      #if {&alt} {
+      #if {&blt} {
+        $alt #var bltname $name;
+        $blt #var altname $name;
+        $alt #echo {-- alt is $alt --};
+        $blt #echo {-- blt is $blt --};
+        #echo {-- active session is #$activesession with character $name, alt is $alt, blt is $blt --};
+      };
+      #elseif {&alt} {
         $alt #var altname $name;
         $alt #echo {-- alt is $alt --};
         #echo {-- active session is #$activesession with character $name, alt is $alt --};
-      } {
+      };
+      #else {
         #echo {-- active session is #$activesession with character $name --};
       };
     };
